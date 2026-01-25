@@ -1,0 +1,27 @@
+{
+  "categories": [
+    {
+      "name": "Frontend",
+      "items": [
+        { "name": "Next.js", "level": 90, "usedFor": ["SSR", "App Router", "Edge runtimes"], "iconKey": "next" },
+        { "name": "React", "level": 90, "usedFor": ["UI", "State", "Hooks"], "iconKey": "react" },
+        { "name": "Tailwind CSS", "level": 85, "usedFor": ["Utility-first", "Responsive", "Dark mode"], "iconKey": "tailwind" }
+      ]
+    },
+    {
+      "name": "Backend",
+      "items": [
+        { "name": "Node.js", "level": 85, "usedFor": ["APIs", "Workers", "Tooling"], "iconKey": "node" },
+        { "name": "Cloudflare Workers", "level": 88, "usedFor": ["Serverless", "Edge", "KV/Queues"], "iconKey": "cloudflare" },
+        { "name": "Supabase", "level": 80, "usedFor": ["Auth", "Postgres", "Storage"], "iconKey": "supabase" }
+      ]
+    },
+    {
+      "name": "Languages",
+      "items": [
+        { "name": "TypeScript", "level": 92, "usedFor": ["Safety", "DX", "Apps"], "iconKey": "typescript" },
+        { "name": "Python", "level": 78, "usedFor": ["Automation", "AI", "Scripting"], "iconKey": "python" }
+      ]
+    }
+  ]
+}

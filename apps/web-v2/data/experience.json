@@ -1,0 +1,22 @@
+[
+  {
+    "role": "Founder & Software Developer",
+    "company": "Electroplix",
+    "period": "2024 — Present",
+    "highlights": [
+      "Built serverless SaaS templates deployed to edge runtimes",
+      "Led design of dark-themed brand and portfolio",
+      "Optimized performance and observability across projects"
+    ]
+  },
+  {
+    "role": "Full-stack Developer",
+    "company": "Freelance",
+    "period": "2022 — 2024",
+    "highlights": [
+      "Delivered MVPs for startups in under 2 weeks",
+      "Integrated AI features with practical product focus",
+      "Mentored teams on Next.js and TypeScript"
+    ]
+  }
+]

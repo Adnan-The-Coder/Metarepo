@@ -3,3 +3,4 @@ build
 dist
 .nx
 dev_artifacts
+build_assets

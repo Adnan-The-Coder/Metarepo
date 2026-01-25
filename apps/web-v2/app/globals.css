@@ -1,8 +1,13 @@
 @import "tailwindcss";
 
+/* Brand Theme Variables (Dark-first) */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #050709; /* Deep black with subtle blue tint */
+  --foreground: #e6edf3; /* Soft off-white */
+  --accent: #06b6d4;     /* Cyan accent */
+  --accent-2: #8b5cf6;   /* Purple accent */
+  --muted: #94a3b8;      /* Slate */
+  --border: #0f172a;     /* Dark slate */
 }
 
 @theme inline {
@@ -12,15 +17,31 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Prefer dark scheme; keep consistent with brand */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #050709;
+    --foreground: #e6edf3;
   }
 }
 
-body {
-  background: var(--background);
+html, body {
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Utility helpers for brand gradients */
+.brand-heading {
+  background-image: linear-gradient(90deg, #ffffff, #cbd5e1, #334155);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.brand-border {
+  border-color: rgba(6, 182, 212, 0.25);
+}
+
+.brand-ring {
+  box-shadow: 0 0 32px rgba(6, 182, 212, 0.1);
 }

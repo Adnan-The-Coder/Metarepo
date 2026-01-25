@@ -1,6 +1,5 @@
-/* eslint-disable no-unused-vars */
- "use client";
-import { useState, useEffect } from "react";
+"use client";
+import { useState, useEffect, useCallback, type MouseEvent } from "react";
 // import { useRouter } from "next/navigation"; // Import `useRouter` for programmatic navigation
 import { motion, useAnimation } from "framer-motion";
 
@@ -12,12 +11,11 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: 'Home', href: '#home' },
   { label: 'About', href: '#about' },
-  { label: 'Experience', href: '#experience' },
-  { label: 'Education', href: '#education' },
   { label: 'Skills', href: '#skills' },
   { label: 'Projects', href: '#projects' },
-  { label: 'Achievements', href: '#achievements' },
-  { label: 'Hobbies', href: '#hobbies' },
+  { label: 'SaaS', href: '#saas' },
+  { label: 'Experience', href: '#experience' },
+  { label: 'Testimonials', href: '#testimonials' },
   { label: 'Contact', href: '#contact' },
 ];
 
@@ -26,33 +24,56 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const controls = useAnimation();
+  const navOffset = 88; // fixed header height for scroll positioning
 //   const router = useRouter(); // Initialize the useRouter hook for navigation
 
-  // Handle scroll event to change navbar style
+  // Scroll-based header state only (no section detection to avoid jank)
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      setScrolled(scrollPosition > 50);
-      
-      // Determine active section based on scroll position
-      const sections = navItems.map(item => item.label.toLowerCase());
-      
-      for (const section of sections) {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          if (rect.top <= 100 && rect.bottom >= 100) {
-            setActiveSection(section);
-            break;
-          }
-        }
-      }
+      setScrolled(window.scrollY > 50);
     };
-    
-    window.addEventListener('scroll', handleScroll);
-    
-return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // IntersectionObserver for active section detection (smoother than scroll loops)
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      {
+        root: null,
+        threshold: 0.35,
+        rootMargin: "-10% 0px -50% 0px",
+      }
+    );
+
+    navItems.forEach(({ label }) => {
+      const el = document.getElementById(label.toLowerCase());
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const handleNavClick = useCallback(
+    (sectionId: string) => (e: MouseEvent<HTMLAnchorElement>) => {
+      e.preventDefault();
+      const target = document.getElementById(sectionId);
+      if (target) {
+        const top = target.getBoundingClientRect().top + window.scrollY - navOffset;
+        window.scrollTo({ top, behavior: 'smooth' });
+        setActiveSection(sectionId);
+        setMenuOpen(false);
+      }
+    },
+    [navOffset]
+  );
 
   // Add animation when scrolled
   useEffect(() => {
@@ -64,58 +85,64 @@ return () => window.removeEventListener('scroll', handleScroll);
   }, [scrolled, controls]);
 
   return (
-    <header 
+    <header
       className={`fixed left-0 top-0 z-50 w-full transition-all duration-300 ${
-        scrolled ? 'bg-gray-900/90 py-3 shadow-md backdrop-blur-md' : 'bg-transparent py-5'
+        scrolled
+          ? 'bg-black/75 py-3 shadow-lg shadow-cyan-500/10 backdrop-blur-md border-b border-cyan-500/10'
+          : 'bg-transparent py-5'
       }`}
     >
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="flex items-center justify-between">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 md:px-6">
+        <div className="flex items-center gap-10">
           {/* Logo */}
-          <motion.a 
+          <motion.a
             href="#home"
-            className="text-2xl font-bold text-white"
+            className="text-2xl font-black tracking-tight text-white"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <span className="text-cyan-500"/>Adnan
+            <span className="bg-gradient-to-r from-white via-cyan-200 to-slate-400 bg-clip-text text-transparent">
+              Adnan
+            </span>
           </motion.a>
           {/* Desktop Navigation */}
-          <nav className="hidden items-center gap-8 md:flex">
+          <nav className="hidden items-center gap-4 md:flex">
             {navItems.map((item, index) => (
               <motion.a
                 key={item.href}
                 href={item.href}
-                className={`relative text-sm font-medium transition-colors ${
-                  activeSection === item.label.toLowerCase() 
-                    ? 'text-cyan-400' 
-                    : 'text-gray-300 hover:text-white'
+                className={`relative rounded-lg px-3 py-2 text-sm font-semibold tracking-wide transition-colors ${
+                  activeSection === item.label.toLowerCase()
+                    ? 'text-white bg-white/5 border border-cyan-500/30 shadow-cyan-500/20 shadow-lg'
+                    : 'text-slate-300 hover:text-white'
                 }`}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
-                onClick={(e:any) => {
-                  e.preventDefault();
-                  const target = document.getElementById(item.label.toLowerCase());
-                  if (target) {
-                    window.scrollTo({
-                      top: target.offsetTop - 100,
-                      behavior: 'smooth'
-                    });
-                  }
-                }}
+                onClick={handleNavClick(item.label.toLowerCase())}
               >
                 {item.label}
                 {activeSection === item.label.toLowerCase() && (
                   <motion.span
-                    className="absolute -bottom-1 left-0 h-0.5 w-full bg-cyan-500"
+                    className="absolute -bottom-1 left-0 h-0.5 w-full bg-gradient-to-r from-cyan-400 to-purple-500"
                     layoutId="navbar-underline"
                   />
                 )}
               </motion.a>
             ))}
           </nav>
+        </div>
+
+        {/* Desktop CTA */}
+        <div className="hidden items-center gap-3 md:flex">
+          <a
+            href="#contact"
+            className="rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-4 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-500/20 hover:text-white transition-colors"
+          >
+            Build your MVP
+          </a>
+        </div>
           {/* Mobile Navigation Toggle */}
           <button 
             type="button"
@@ -148,11 +175,10 @@ return () => window.removeEventListener('scroll', handleScroll);
             </svg>
           </button>
         </div>
-      </div>
       {/* Mobile Navigation Menu */}
       {menuOpen && (
         <motion.div 
-          className="bg-gray-900 shadow-xl md:hidden"
+          className="bg-black/90 shadow-xl md:hidden border-t border-cyan-500/10"
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
@@ -169,21 +195,18 @@ return () => window.removeEventListener('scroll', handleScroll);
                       ? 'text-cyan-400' 
                       : 'text-gray-300 hover:text-white'
                   }`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const target = document.getElementById(item.label.toLowerCase());
-                    if (target) {
-                      window.scrollTo({
-                        top: target.offsetTop - 100,
-                        behavior: 'smooth'
-                      });
-                      setMenuOpen(false);
-                    }
-                  }}
+                  onClick={handleNavClick(item.label.toLowerCase())}
                 >
                   {item.label}
                 </a>
               ))}
+              <a
+                href="#contact"
+                className="mt-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-4 py-3 text-center text-sm font-semibold text-cyan-100 hover:bg-cyan-500/20"
+                onClick={handleNavClick('contact')}
+              >
+                Build your MVP
+              </a>
             </nav>
           </div>
         </motion.div>

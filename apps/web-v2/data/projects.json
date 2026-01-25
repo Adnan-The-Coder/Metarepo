@@ -1,0 +1,26 @@
+[
+  {
+    "id": "electroplix",
+    "name": "Electroplix",
+    "year": 2024,
+    "description": "Serverless SaaS tooling and starter kits deployed on the edge.",
+    "tech": ["Next.js", "Workers", "KV", "Tailwind"],
+    "links": { "site": "https://electroplix.com", "repo": "https://github.com/Adnan-The-Coder" }
+  },
+  {
+    "id": "portfolio",
+    "name": "Portfolio v2",
+    "year": 2025,
+    "description": "Dark-themed interactive portfolio with canvas animations and data-driven sections.",
+    "tech": ["Next.js", "React", "Tailwind"],
+    "links": { "site": "https://adnanthecoder.com", "repo": null }
+  },
+  {
+    "id": "mvp-studio",
+    "name": "MVP Studio",
+    "year": 2025,
+    "description": "Rapid MVP delivery pipeline leveraging serverless and modern DX.",
+    "tech": ["Next.js", "Workers", "Supabase"],
+    "links": { "site": null, "repo": null }
+  }
+]

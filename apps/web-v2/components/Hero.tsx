@@ -412,7 +412,7 @@ const Hero = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-black overflow-hidden">
+    <div className="relative min-h-screen bg-black overflow-hidden font-sans pt-24 lg:pt-28">
       {/* Multi-layer background */}
       <canvas ref={canvasRef} className="absolute inset-0 z-0" />
       <canvas ref={overlayCanvasRef} className="absolute inset-0 z-5 opacity-60" />
@@ -433,37 +433,23 @@ const Hero = () => {
 
       {/* Mobile Layout */}
       <div className="lg:hidden">
-        {/* Status indicators */}
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30">
-          <div className="flex items-center space-x-3 text-xs font-mono text-cyan-400/80">
-            <div className="flex items-center space-x-1">
-              <div className="w-1 h-1 bg-cyan-400 rounded-full animate-pulse" />
-              <span>ONLINE</span>
-            </div>
-            <span className="text-slate-600">|</span>
-            <span className="text-slate-400">PROD</span>
-          </div>
-        </div>
-
         {/* Main content */}
-        <div className="relative z-25 px-4 py-16 text-center">
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight mb-3">
-            <span className="bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent drop-shadow-lg">
-              Adnan
-            </span>
+        <div className="relative z-25 px-4 py-20 text-center max-w-3xl mx-auto">
+          <h1 className="text-4xl sm:text-6xl font-black tracking-tight mb-3 leading-tight">
+            <span className="brand-heading drop-shadow-lg">Adnan</span>
           </h1>
-          <h2 className="text-lg sm:text-xl font-light tracking-[0.25em] text-slate-300/90 mb-4">
-            FULL STACK DEVELOPER
+          <h2 className="text-lg sm:text-xl font-semibold tracking-[0.2em] text-slate-200/90 mb-4 uppercase">
+            Full Stack Developer
           </h2>
-          <p className="text-sm text-slate-400/80 max-w-xs mx-auto leading-relaxed mb-8">
-            Architecting scalable solutions with cutting-edge technologies
+          <p className="text-base text-slate-300/80 max-w-xl mx-auto leading-relaxed mb-9">
+            Architecting scalable, edge-first experiences with tasteful dark UI.
           </p>
           
           <div className="flex flex-col gap-3 mb-12">
-            <button className="px-6 py-3 bg-white/90 text-black font-semibold rounded-lg hover:bg-white transition-all duration-300 backdrop-blur-sm">
+            <button className="px-6 py-3 rounded-lg bg-cyan-500 text-black font-semibold hover:bg-cyan-400 transition-all duration-300 shadow-lg shadow-cyan-500/25">
               Explore Projects
             </button>
-            <button className="px-6 py-3 border border-cyan-500/30 text-cyan-300 font-semibold rounded-lg hover:border-cyan-400/50 hover:text-cyan-200 transition-all duration-300 backdrop-blur-sm">
+            <button className="px-6 py-3 rounded-lg border border-cyan-500/40 text-cyan-200 font-semibold hover:border-cyan-400/60 hover:text-white transition-all duration-300">
               Connect
             </button>
           </div>
@@ -513,19 +499,7 @@ const Hero = () => {
 
       {/* Desktop Layout */}
       <div className="hidden lg:block">
-        {/* Status bar */}
-        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 flex items-center space-x-6 text-sm font-mono text-slate-400/80 z-30">
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
-            <span className="text-cyan-400/80">SYSTEM ONLINE</span>
-          </div>
-          <span className="text-slate-600">|</span>
-          <span>PORT:3000</span>
-          <span className="text-slate-600">|</span>
-          <span>PRODUCTION</span>
-        </div>
-
-        <div className="grid grid-cols-12 gap-8 h-screen p-8">
+        <div className="grid grid-cols-12 gap-8 max-w-7xl mx-auto px-6 lg:px-10 py-16 min-h-[80vh] items-center">
           
           {/* Left - Floating terminal */}
           <div className="col-span-3 flex flex-col justify-center">
@@ -546,23 +520,22 @@ const Hero = () => {
 
           {/* Center */}
           <div className="col-span-6 flex flex-col justify-center items-center text-center relative z-25">
-            <h1 className="text-7xl xl:text-8xl font-black tracking-tight mb-6">
-              <span className="bg-gradient-to-r from-white via-slate-300 to-slate-900 bg-clip-text text-transparent drop-shadow-2xl">
-                Adnan
-              </span>
+            <h1 className="text-6xl xl:text-7xl font-black tracking-tight mb-6 leading-tight">
+              <span className="brand-heading drop-shadow-2xl">Adnan</span>
             </h1>
-            <h2 className="text-2xl xl:text-3xl font-light tracking-[0.3em] text-slate-300/90 mb-10">
-              FULL STACK DEVELOPER
+            <h2 className="text-xl xl:text-2xl font-semibold tracking-[0.28em] text-slate-200/90 mb-8 uppercase">
+              Full Stack Developer
             </h2>
-            <p className="text-lg text-slate-400/80 max-w-2xl mx-auto leading-relaxed mb-16">
-              Architecting scalable solutions with cutting-edge technologies
+            <p className="text-lg text-slate-300/85 max-w-2xl mx-auto leading-relaxed mb-16">
+              <span className="block">Architecting scalable, edge-first solutions.</span>
+              <span className="block text-slate-200 font-semibold mt-1">Revolutionize your systems, one build at a time.</span>
             </p>
 
-            <div className="flex gap-8 mb-20">
-              <button className="px-10 py-4 bg-white/90 text-black font-semibold rounded-lg hover:bg-white transition-all duration-300 hover:scale-105 hover:shadow-xl backdrop-blur-sm">
+            <div className="flex gap-6 mb-16">
+              <button className="px-10 py-4 rounded-lg bg-cyan-500 text-black font-semibold hover:bg-cyan-400 transition-all duration-300 hover:scale-105 shadow-lg shadow-cyan-500/25">
                 Explore Projects
               </button>
-              <button className="px-10 py-4 border border-cyan-500/30 text-cyan-300 font-semibold rounded-lg hover:border-cyan-400/50 hover:text-cyan-200 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+              <button className="px-10 py-4 rounded-lg border border-cyan-500/40 text-cyan-200 font-semibold hover:border-cyan-400/60 hover:text-white transition-all duration-300 hover:scale-105">
                 Connect
               </button>
             </div>

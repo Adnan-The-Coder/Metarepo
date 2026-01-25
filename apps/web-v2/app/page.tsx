@@ -1,18 +1,28 @@
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
-// import Navbar from "@/components/Navbar";
-// import Background from "@/components/ui/Background-raw-dotted";
-// import Background from "@/components/ui/Background-cursor-based-glow";
-// import Background from "@/components/ui/Background-github-graph-like";
-// import Background from "@/components/ui/Background-visible-non-glowing-github-type";
+import Navbar from "@/components/Navbar";
+import AboutSection from "@/components/sections/AboutSection";
+import TechStackSection from "@/components/sections/TechStackSection";
+import ProjectsSection from "@/components/sections/ProjectsSection";
+import SaaSSection from "@/components/sections/SaaSSection";
+import ExperienceSection from "@/components/sections/ExperienceSection";
+import TestimonialsSection from "@/components/sections/TestimonialsSection";
+import CTASection from "@/components/sections/CTASection";
 
 export default function Home() {
 	return (
 		<>
-    {/* <Background/> */}
-    {/* <Navbar/> */}
-    {/* <br /> */}
-    <Hero/>
+		<Navbar/>
+		<div id="home">
+			<Hero/>
+		</div>
+		<AboutSection/>
+		<TechStackSection/>
+		<ProjectsSection/>
+		<SaaSSection/>
+		<ExperienceSection/>
+		<TestimonialsSection/>
+		<CTASection/>
 		<Footer/>
 		</>
 	
