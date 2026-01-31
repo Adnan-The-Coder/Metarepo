@@ -16,7 +16,6 @@ const navItems: NavItem[] = [
   { label: 'SaaS', href: '#saas' },
   { label: 'Experience', href: '#experience' },
   { label: 'Testimonials', href: '#testimonials' },
-  { label: 'Contact', href: '#contact' },
 ];
 
 export default function Navbar() {
@@ -123,12 +122,6 @@ export default function Navbar() {
                 onClick={handleNavClick(item.label.toLowerCase())}
               >
                 {item.label}
-                {activeSection === item.label.toLowerCase() && (
-                  <motion.span
-                    className="absolute -bottom-1 left-0 h-0.5 w-full bg-gradient-to-r from-cyan-400 to-purple-500"
-                    layoutId="navbar-underline"
-                  />
-                )}
               </motion.a>
             ))}
           </nav>

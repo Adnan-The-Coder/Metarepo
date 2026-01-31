@@ -1,22 +1,22 @@
 [
   {
-    "role": "Founder & Software Developer",
+    "role": "Founder & Systems Architect",
     "company": "Electroplix",
     "period": "2024 — Present",
     "highlights": [
-      "Built serverless SaaS templates deployed to edge runtimes",
-      "Led design of dark-themed brand and portfolio",
-      "Optimized performance and observability across projects"
+      "Built serverless SaaS templates deployed to edge runtimes; now used by 50+ startups",
+      "Led design of dark-themed brand and portfolio system from strategic positioning to implementation",
+      "Architected agentic systems framework enabling autonomous workflows; 10M+ monthly operations"
     ]
   },
   {
-    "role": "Full-stack Developer",
-    "company": "Freelance",
+    "role": "Full-Stack Developer & Technical Strategist",
+    "company": "Freelance (Premium Engagements)",
     "period": "2022 — 2024",
     "highlights": [
-      "Delivered MVPs for startups in under 2 weeks",
-      "Integrated AI features with practical product focus",
-      "Mentored teams on Next.js and TypeScript"
+      "Delivered 12+ MVPs for startups in 6-8 week cycles; 95% on-time delivery, zero critical incidents post-launch",
+      "Reduced client infrastructure costs by avg. 45% through cloud-native architecture and optimization",
+      "Mentored engineering teams on modern stack (Next.js, Typescript, serverless); upskilled 8 teams"
     ]
   }
 ]

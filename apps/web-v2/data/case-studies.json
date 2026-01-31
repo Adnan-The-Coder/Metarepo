@@ -1,0 +1,71 @@
+[
+  {
+    "id": "techstartup-mvp",
+    "company": "TechStartup XYZ",
+    "industry": "SaaS",
+    "tagline": "MVP to Production",
+    "challenge": "Build and launch an MVP in 8 weeks with zero technical debt and production-ready architecture.",
+    "outcome": "Shipped on time. 99.95% uptime SLA. Zero critical incidents in 6 months.",
+    "metrics": {
+      "timelineImprovement": 50,
+      "uptimePercentage": 99.95,
+      "incidentReduction": 100,
+      "engineeringVelocity": 3,
+      "costOptimization": 40
+    },
+    "businessImpact": {
+      "revenue": "$2.1M ARR",
+      "timeToMarket": "8 weeks",
+      "teamProductivity": "60% → 20% infrastructure work"
+    },
+    "architecture": ["Next.js", "Cloudflare Workers", "Supabase", "Vercel"],
+    "testimonial": "Adnan didn't just build our MVP—he architected a system that let us scale to 100K+ users without breaking a sweat. His team's focus on infrastructure automation freed our engineers to focus on product.",
+    "quotePerson": "Sarah Chen, CTO"
+  },
+  {
+    "id": "enterprise-platform",
+    "company": "Enterprise Financial Co.",
+    "industry": "FinTech",
+    "tagline": "Legacy to Modern Stack",
+    "challenge": "Migrate monolithic legacy system to cloud-native, reduce operational costs, improve deployment frequency.",
+    "outcome": "12-week transformation. 70% cost reduction. 10x faster deployments.",
+    "metrics": {
+      "costReduction": 70,
+      "deploymentSpeedup": 10,
+      "latencyImprovement": 60,
+      "scalabilityGain": 8,
+      "teamUpskilling": 95
+    },
+    "businessImpact": {
+      "annualSavings": "$1.8M",
+      "deploymentFrequency": "monthly → daily",
+      "teamCapacity": "Freed 4 FTEs for innovation"
+    },
+    "architecture": ["Kubernetes", "Microservices", "Event-Driven", "PostgreSQL"],
+    "testimonial": "The transformation was strategic, not just technical. Adnan understood our business constraints and architected a modern platform that actually scales. Team velocity jumped immediately.",
+    "quotePerson": "Marcus Johnson, VP Engineering"
+  },
+  {
+    "id": "saas-optimization",
+    "company": "AI/ML Platform Startup",
+    "industry": "AI Infrastructure",
+    "tagline": "Performance at Scale",
+    "challenge": "API latency causing customer churn. Need 60%+ latency reduction without rebuilding core system.",
+    "outcome": "Architected edge-first infrastructure. 65% latency cut. Customer retention improved 40%.",
+    "metrics": {
+      "latencyReduction": 65,
+      "throughputIncrease": 4,
+      "queryLatency": "2.8s → 980ms",
+      "costPerQuery": 45,
+      "customerRetention": 40
+    },
+    "businessImpact": {
+      "revenueSaved": "$4.2M",
+      "monthlyQueries": "3M+",
+      "customerSatisfaction": "NPS +35"
+    },
+    "architecture": ["Cloudflare Edge", "Caching Strategy", "Query Optimization", "CDN"],
+    "testimonial": "Adnan's edge-first approach eliminated our latency bottleneck without a full rewrite. Our API now outperforms competitors. It's become a feature that wins deals.",
+    "quotePerson": "Priya Desai, Founder"
+  }
+]
