@@ -12,5 +12,41 @@
   },
   "vars": {
     "ENVIRONMENT": "development"
+  },
+  "d1_databases": [  // Optional: keep dev config here
+    {
+      "binding": "DB",
+      "database_name": "metarepo-db",
+      "database_id": "52edc808-da07-41bc-b605-a5f8e5947e3d",
+      "migrations_dir": "./drizzle"
+    }
+  ],
+  "env": {
+    "production": {
+      "vars": {
+        "ENVIRONMENT": "production"
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "metarepo-db",
+          "database_id": "52edc808-da07-41bc-b605-a5f8e5947e3d",
+          "migrations_dir": "./drizzle"
+        }
+      ]
+    },
+    "staging": {
+      "vars": {
+        "ENVIRONMENT": "staging"
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "metarepo-db",
+          "database_id": "52edc808-da07-41bc-b605-a5f8e5947e3d",
+          "migrations_dir": "./drizzle"
+        }
+      ]
+    }
   }
 }
