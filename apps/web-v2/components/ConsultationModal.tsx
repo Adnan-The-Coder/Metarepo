@@ -174,7 +174,7 @@ export default function ConsultationModal({ isOpen, onClose }: ConsultationModal
 
   return (
     <>
-      <style jsx>{`
+      <style>{`
         @keyframes backdrop-fade {
           from {
             opacity: 0;
