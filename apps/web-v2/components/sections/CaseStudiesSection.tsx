@@ -1,8 +1,9 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Section from "@/components/ui/Section";
 import Card from "@/components/ui/Card";
 import Tag from "@/components/ui/Tag";
+import ConsultationModal from "@/components/ConsultationModal";
 import caseStudies from "@/data/case-studies.json";
 
 type CaseStudy = {
@@ -98,12 +99,15 @@ function CaseStudyCard({ study }: { study: CaseStudy }) {
 }
 
 export default function CaseStudiesSection() {
+  const [consultationModalOpen, setConsultationModalOpen] = useState(false);
+
   return (
-    <Section
-      id="case-studies"
-      title="Case Studies"
-      subtitle="How we deliver scalable systems that drive measurable business impact"
-    >
+    <>
+      <Section
+        id="case-studies"
+        title="Case Studies"
+        subtitle="How we deliver scalable systems that drive measurable business impact"
+      >
       {/* Overview Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-12">
         <Card>
@@ -208,13 +212,19 @@ export default function CaseStudiesSection() {
         <p className="text-slate-300 mb-6 max-w-2xl mx-auto">
           Let's discuss your architecture challenges and how we can deliver measurable business impact.
         </p>
-        <a
-          href="#contact"
-          className="inline-block px-6 py-3 rounded-lg bg-emerald-500 text-black font-semibold hover:bg-emerald-400 transition-all"
+        <button
+          onClick={() => setConsultationModalOpen(true)}
+          className="inline-block px-6 py-3 rounded-lg bg-emerald-500 text-black font-semibold hover:bg-emerald-400 transition-all hover:shadow-lg hover:shadow-emerald-500/30"
         >
           Schedule Architect Consultation
-        </a>
+        </button>
       </div>
     </Section>
+
+    <ConsultationModal
+      isOpen={consultationModalOpen}
+      onClose={() => setConsultationModalOpen(false)}
+    />
+    </>
   );
 }

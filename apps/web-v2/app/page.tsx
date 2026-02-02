@@ -6,7 +6,7 @@ import TechStackSection from "@/components/sections/TechStackSection";
 import ProjectsSection from "@/components/sections/ProjectsSection";
 // import SaaSSection from "@/components/sections/SaaSSection";
 import ExperienceSection from "@/components/sections/ExperienceSection";
-import TestimonialsSection from "@/components/sections/TestimonialsSection";
+// import TestimonialsSection from "@/components/sections/TestimonialsSection";
 import CaseStudiesSection from "@/components/sections/CaseStudiesSection";
 import CTASection from "@/components/sections/CTASection";
 
@@ -22,7 +22,7 @@ export default function Home() {
 		<ProjectsSection/>
 		{/* <SaaSSection/> */}
 		<ExperienceSection/>
-		<TestimonialsSection/>
+		{/* <TestimonialsSection/> */}
 		<CaseStudiesSection/>
 		<CTASection/>
 		<Footer/>

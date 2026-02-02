@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, type MouseEvent } from "react";
 // import { useRouter } from "next/navigation"; // Import `useRouter` for programmatic navigation
 import { motion, useAnimation } from "framer-motion";
+import ConsultationModal from "@/components/ConsultationModal";
 
 interface NavItem {
   label: string;
@@ -22,6 +23,7 @@ export default function Navbar() {
   const [activeSection, setActiveSection] = useState('home');
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [consultationModalOpen, setConsultationModalOpen] = useState(false);
   const controls = useAnimation();
   const navOffset = 88; // fixed header height for scroll positioning
 //   const router = useRouter(); // Initialize the useRouter hook for navigation
@@ -129,12 +131,12 @@ export default function Navbar() {
 
         {/* Desktop CTA */}
         <div className="hidden items-center gap-3 md:flex">
-          <a
-            href="#contact"
+          <button
+            onClick={() => setConsultationModalOpen(true)}
             className="rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-4 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-500/20 hover:text-white transition-colors"
           >
             Build your MVP
-          </a>
+          </button>
         </div>
           {/* Mobile Navigation Toggle */}
           <button 
@@ -193,17 +195,24 @@ export default function Navbar() {
                   {item.label}
                 </a>
               ))}
-              <a
-                href="#contact"
-                className="mt-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-4 py-3 text-center text-sm font-semibold text-cyan-100 hover:bg-cyan-500/20"
-                onClick={handleNavClick('contact')}
+              <button
+                onClick={() => {
+                  setConsultationModalOpen(true);
+                  setMenuOpen(false);
+                }}
+                className="mt-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-4 py-3 text-center w-full text-sm font-semibold text-cyan-100 hover:bg-cyan-500/20 transition-colors"
               >
                 Build your MVP
-              </a>
+              </button>
             </nav>
           </div>
         </motion.div>
       )}
+      
+      <ConsultationModal
+        isOpen={consultationModalOpen}
+        onClose={() => setConsultationModalOpen(false)}
+      />
     </header>
   );
 }
