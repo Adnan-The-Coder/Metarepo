@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import AboutSection from "@/components/sections/AboutSection";
 import TechStackSection from "@/components/sections/TechStackSection";
 import ProjectsSection from "@/components/sections/ProjectsSection";
-import SaaSSection from "@/components/sections/SaaSSection";
+// import SaaSSection from "@/components/sections/SaaSSection";
 import ExperienceSection from "@/components/sections/ExperienceSection";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
 import CaseStudiesSection from "@/components/sections/CaseStudiesSection";
@@ -20,7 +20,7 @@ export default function Home() {
 		<AboutSection/>
 		<TechStackSection/>
 		<ProjectsSection/>
-		<SaaSSection/>
+		{/* <SaaSSection/> */}
 		<ExperienceSection/>
 		<TestimonialsSection/>
 		<CaseStudiesSection/>

@@ -1,7 +1,7 @@
 [
   {
-    "id": "techstartup-mvp",
-    "company": "TechStartup XYZ",
+    "id": "plantomart",
+    "company": "PlantoMart",
     "industry": "SaaS",
     "tagline": "MVP to Production",
     "challenge": "Build and launch an MVP in 8 weeks with zero technical debt and production-ready architecture.",
@@ -18,17 +18,17 @@
       "timeToMarket": "8 weeks",
       "teamProductivity": "60% → 20% infrastructure work"
     },
-    "architecture": ["Next.js", "Cloudflare Workers", "Supabase", "Vercel"],
-    "testimonial": "Adnan didn't just build our MVP—he architected a system that let us scale to 100K+ users without breaking a sweat. His team's focus on infrastructure automation freed our engineers to focus on product.",
-    "quotePerson": "Sarah Chen, CTO"
+    "architecture": ["Next.js", "Tailwind CSS", "Drizzle ORM","D1 Database", "Redis","HonoJS","NX","Cloudflare Edge", "Biome","Github Action"],
+    "testimonial": "Adnan didn't just build our MVP—he architected a system that let us scale to 100K+ users without breaking a sweat.",
+    "quotePerson": "Shoeb, Founder"
   },
   {
-    "id": "enterprise-platform",
-    "company": "Enterprise Financial Co.",
+    "id": "Cognithesis",
+    "company": "Cognithesis",
     "industry": "FinTech",
-    "tagline": "Legacy to Modern Stack",
+    "tagline": "AI Based Research and Information optimization",
     "challenge": "Migrate monolithic legacy system to cloud-native, reduce operational costs, improve deployment frequency.",
-    "outcome": "12-week transformation. 70% cost reduction. 10x faster deployments.",
+    "outcome": "4-week transformation. 70% cost reduction. 10x faster deployments.",
     "metrics": {
       "costReduction": 70,
       "deploymentSpeedup": 10,
@@ -41,13 +41,13 @@
       "deploymentFrequency": "monthly → daily",
       "teamCapacity": "Freed 4 FTEs for innovation"
     },
-    "architecture": ["Kubernetes", "Microservices", "Event-Driven", "PostgreSQL"],
-    "testimonial": "The transformation was strategic, not just technical. Adnan understood our business constraints and architected a modern platform that actually scales. Team velocity jumped immediately.",
-    "quotePerson": "Marcus Johnson, VP Engineering"
+    "architecture": ["Kubernetes", "Microservices",  "D1 Database", "Redis","Cloudflare","CI/CD Pipelines","Kafka"],
+    "testimonial": "The transformation was strategic, not just technical. Adnan understood our business constraints and architected a modern platform that actually scales.",
+    "quotePerson": "Ismail, Founder & CEO"
   },
   {
     "id": "saas-optimization",
-    "company": "AI/ML Platform Startup",
+    "company": "Electroplix",
     "industry": "AI Infrastructure",
     "tagline": "Performance at Scale",
     "challenge": "API latency causing customer churn. Need 60%+ latency reduction without rebuilding core system.",
@@ -66,6 +66,6 @@
     },
     "architecture": ["Cloudflare Edge", "Caching Strategy", "Query Optimization", "CDN"],
     "testimonial": "Adnan's edge-first approach eliminated our latency bottleneck without a full rewrite. Our API now outperforms competitors. It's become a feature that wins deals.",
-    "quotePerson": "Priya Desai, Founder"
+    "quotePerson": "Abid, CTO"
   }
 ]

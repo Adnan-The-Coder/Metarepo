@@ -1,22 +1,34 @@
 [
   {
-    "role": "Founder & Systems Architect",
-    "company": "Electroplix",
-    "period": "2024 — Present",
+    "role": "Freelance Engineer & Technical Consultant",
+    "company": "Independent",
+    "period": "Current",
     "highlights": [
-      "Built serverless SaaS templates deployed to edge runtimes; now used by 50+ startups",
-      "Led design of dark-themed brand and portfolio system from strategic positioning to implementation",
-      "Architected agentic systems framework enabling autonomous workflows; 10M+ monthly operations"
+      "Currently engaged under two active contracts, delivering high-impact engineering solutions for early-stage and growth-phase companies",
+      "Leading end-to-end system design and implementation, including backend architecture, cloud infrastructure, and production-grade deployment pipelines",
+      "Partnering directly with founders and stakeholders to translate business requirements into scalable technical solutions, acting as both execution lead and technical advisor",
+      "Driving performance optimization, reliability improvements, and cost-efficient cloud architectures while maintaining rapid iteration cycles"
     ]
   },
   {
-    "role": "Full-Stack Developer & Technical Strategist",
-    "company": "Freelance (Premium Engagements)",
-    "period": "2022 — 2024",
+    "role": "Tech Head",
+    "company": "ACM MJCET",
+    "period": "09/25 — Current",
     "highlights": [
-      "Delivered 12+ MVPs for startups in 6-8 week cycles; 95% on-time delivery, zero critical incidents post-launch",
-      "Reduced client infrastructure costs by avg. 45% through cloud-native architecture and optimization",
-      "Mentored engineering teams on modern stack (Next.js, Typescript, serverless); upskilled 8 teams"
+      "Implementing and continuously refining DevOps best practices, including CI/CD pipelines, automated testing, and infrastructure as code, to accelerate delivery velocity and improve system reliability",
+      "Managing and scaling the organization’s codebase using an NX monorepo architecture, driving modularity, consistency, and long-term maintainability across multiple projects",
+      "Establishing engineering standards and workflows to support collaborative development and reduce operational friction across teams"
+    ]
+  },
+  {
+    "role": "Founding Engineer",
+    "company": "NaviGo Rides",
+    "period": "07/25 — Current",
+    "highlights": [
+      "Architected and implemented a modern, scalable distributed system leveraging serverless infrastructure to support rapid growth and operational efficiency",
+      "Designed and optimized high-throughput data pipelines using Kafka, integrating backend databases to enable real-time processing and analytics",
+      "Led backend development of core business logic and successfully navigated a full end-to-end compliance audit, ensuring strict regulatory adherence",
+      "Owned the mobile application development lifecycle from concept to production release, maintaining strict alignment with brand design standards and UX requirements"
     ]
   }
 ]

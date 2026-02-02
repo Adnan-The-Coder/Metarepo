@@ -108,8 +108,8 @@ export default function CaseStudiesSection() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-12">
         <Card>
           <div className="text-center">
-            <div className="text-3xl font-black text-emerald-400 mb-1">$8.1M</div>
-            <p className="text-sm text-slate-400">Revenue Impact</p>
+            <div className="text-3xl font-black text-emerald-400 mb-1">90%</div>
+            <p className="text-sm text-slate-400">Product Code Quality + Security Enhancements</p>
           </div>
         </Card>
         <Card>

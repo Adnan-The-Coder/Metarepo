@@ -13,13 +13,12 @@ export default function AboutSection() {
             and pairing them with serverless backends for reliability and scale.
           </p>
           <p className="mt-4 text-slate-400 text-sm">
-            Current focus: Next.js App Router, Cloudflare Workers, TypeScript,
-            and opinionated SaaS templates.
+            Current focus: Enterprise Grade Scalability  with JAVA Spring Boot Backend Systems over a distributed services architecture and K8s orchestration.
           </p>
         </Card>
         <Card>
           <div className="space-y-3 text-sm">
-            <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between">
               <span className="text-slate-400">Location</span>
               <span className="text-slate-200">Remote‑first</span>
             </div>

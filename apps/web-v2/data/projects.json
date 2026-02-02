@@ -1,26 +1,26 @@
 [
   {
-    "id": "electroplix",
-    "name": "Electroplix",
+    "id": "PlantoMart",
+    "name": "PlantoMart",
     "year": 2024,
-    "description": "Serverless SaaS tooling and starter kits deployed on the edge.",
-    "tech": ["Next.js", "Workers", "KV", "Tailwind"],
-    "links": { "site": "https://electroplix.com", "repo": "https://github.com/Adnan-The-Coder" }
+    "description": "Planto-Mart is a full stack Ecommerce Multi-Vendor Platform, enabling vendors to list products, facilitating customers to purchase products across different vendors. Each Vendor has it's own Dashboard to manage all of it's shop's products and view analytics and much more",
+    "tech": ["Next.js", "Workers", "Drizzle", "Tailwind","HonoJS","cloudflare"],
+    "links": { "site": "https://plantomart.com", "repo": "https://github.com/Adnan-The-Coder/plantomart-full-stack-application" }
   },
   {
-    "id": "portfolio",
-    "name": "Portfolio v2",
+    "id": "MetaRepo",
+    "name": "MetaRepo",
     "year": 2025,
-    "description": "Dark-themed interactive portfolio with canvas animations and data-driven sections.",
-    "tech": ["Next.js", "React", "Tailwind"],
-    "links": { "site": "https://adnanthecoder.com", "repo": null }
+    "description": "An opensource initiative as Comprehensive Monorepo  containing all deployable templates for modern web applications, covering a wide range of use cases and tech stacks.",
+    "tech": ["NX", "PNPM", "Github Actions", "TypeScript"],
+    "links": { "site": null, "repo": "https://github.com/Adnan-The-Coder/MetaRepo" }
   },
   {
-    "id": "mvp-studio",
-    "name": "MVP Studio",
-    "year": 2025,
-    "description": "Rapid MVP delivery pipeline leveraging serverless and modern DX.",
-    "tech": ["Next.js", "Workers", "Supabase"],
-    "links": { "site": null, "repo": null }
+    "id": "EHCF",
+    "name": "EHCF Healthcare Platform",
+    "year": 2026,
+    "description": "A Healthcare platform using B2B APIs to connect patients with healthcare providers and manage medical records securely over serverless infrastructure.",
+    "tech": ["Vite.js", "React", "Tailwind", "cloudflare","D1","HonoJS"],
+    "links": { "site": "https://ehcflabs-main-web.pages.dev/", "repo": "https://github.com/Adnan-The-Coder/ehcfl-labs-main" }
   }
 ]

@@ -1,7 +1,7 @@
 // needs to be refactored with biome disable removals
 "use client";
 import { useEffect, useRef, useCallback } from "react";
-import { FaGithub, FaLinkedin, FaInstagram, FaCode, FaServer } from "react-icons/fa";
+import { FaGithub, FaLinkedin, FaInstagram, FaCode, FaServer, FaThreads } from "react-icons/fa6";
 import { BiCodeAlt } from "react-icons/bi";
 import Link from "next/link";
 
@@ -56,6 +56,12 @@ const Footer = () => {
       icon: FaInstagram, 
       color: "hover:bg-pink-600 hover:shadow-pink-500/25", 
       label: "Instagram"
+    },
+    { 
+      href: "https://www.threads.com/@adnan_the_coder", 
+      icon: FaThreads, 
+      color: "hover:bg-gray-800 hover:shadow-gray-500/25", 
+      label: "Threads"
     }
   ];
 
