@@ -4,3 +4,4 @@ dist
 .nx
 dev_artifacts
 build_assets
+.ssh
