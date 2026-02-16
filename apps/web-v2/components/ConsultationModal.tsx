@@ -368,39 +368,41 @@ export default function ConsultationModal({ isOpen, onClose }: ConsultationModal
 
       {/* Backdrop */}
       <div
-        className="modal-backdrop fixed inset-0 bg-black/60 backdrop-blur-md z-[60]"
+        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50"
         onClick={onClose}
+        aria-hidden="true"
       />
 
-      {/* Modal */}
-      <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 pointer-events-none">
+      {/* Modal Container - Higher z-index than backdrop */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 pointer-events-none overflow-y-auto">
         <div
           ref={modalRef}
-          className="modal-container pointer-events-auto w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
+          className="modal-container pointer-events-auto w-full max-w-sm sm:max-w-md lg:max-w-2xl my-auto rounded-xl sm:rounded-2xl shadow-2xl"
         >
           <div className="modal-inner shadow-2xl shadow-cyan-500/20">
             <div className="pattern-overlay"></div>
 
-            {/* Header */}
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-cyan-500/20 bg-slate-950/98 backdrop-blur-xl px-6 py-5">
-              <div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent">
+            {/* Header - Sticky and properly positioned */}
+            <div className="sticky top-0 z-20 flex items-center justify-between gap-2 sm:gap-3 border-b border-cyan-500/20 bg-slate-950/98 backdrop-blur-xl px-4 sm:px-6 py-4 sm:py-5 min-h-20 sm:min-h-24">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent line-clamp-2">
                   Schedule Consultation
                 </h2>
-                <p className="text-sm text-slate-400 mt-1.5">
+                <p className="text-xs sm:text-sm text-slate-400 mt-0.5 sm:mt-1 line-clamp-2">
                   Tell us about your project and let's discuss how it can shipped successfully.
                 </p>
               </div>
               <button
                 onClick={onClose}
-                className="close-button p-2.5 rounded-lg text-slate-400"
+                className="close-button flex-shrink-0 p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-all active:scale-95"
+                aria-label="Close modal"
               >
-                <FiX size={24} />
+                <FiX size={24} className="w-6 h-6" />
               </button>
             </div>
 
-            {/* Content */}
-            <div className="p-6 relative">
+            {/* Content Area */}
+            <div className="p-4 sm:p-6 relative max-h-[calc(100vh-12rem)] sm:max-h-[calc(100vh-14rem)] overflow-y-auto custom-scrollbar">
               {status === "success" ? (
                 <div className="space-y-6 py-8">
                   <div className="flex justify-center">
@@ -496,19 +498,19 @@ export default function ConsultationModal({ isOpen, onClose }: ConsultationModal
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
                   {/* Error Message */}
                   {status === "error" && (
-                    <div className="flex items-start gap-3 p-4 rounded-lg bg-red-500/10 border border-red-500/30 backdrop-blur-sm">
-                      <FiAlertCircle className="text-red-400 flex-shrink-0 mt-0.5" size={20} />
-                      <p className="text-sm text-red-300">{errorMessage}</p>
+                    <div className="flex items-start gap-3 p-3 sm:p-4 rounded-lg bg-red-500/10 border border-red-500/30 backdrop-blur-sm">
+                      <FiAlertCircle className="text-red-400 flex-shrink-0 mt-0.5 w-5 h-5 sm:w-6 sm:h-6" />
+                      <p className="text-xs sm:text-sm text-red-300">{errorMessage}</p>
                     </div>
                   )}
 
                   {/* Personal Info Row */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
-                      <label className="block text-sm font-semibold text-slate-300 mb-2">
+                      <label className="block text-xs sm:text-sm font-semibold text-slate-300 mb-1.5 sm:mb-2">
                         Full Name <span className="text-cyan-400">*</span>
                       </label>
                       <input
@@ -517,12 +519,12 @@ export default function ConsultationModal({ isOpen, onClose }: ConsultationModal
                         value={formData.name}
                         onChange={handleChange}
                         required
-                        className="input-field w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
+                        className="input-field w-full px-3 sm:px-4 py-2 sm:py-3 text-sm rounded-lg bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
                         placeholder="John Doe"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-slate-300 mb-2">
+                      <label className="block text-xs sm:text-sm font-semibold text-slate-300 mb-1.5 sm:mb-2">
                         Email <span className="text-cyan-400">*</span>
                       </label>
                       <input
@@ -531,16 +533,16 @@ export default function ConsultationModal({ isOpen, onClose }: ConsultationModal
                         value={formData.email}
                         onChange={handleChange}
                         required
-                        className="input-field w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
+                        className="input-field w-full px-3 sm:px-4 py-2 sm:py-3 text-sm rounded-lg bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
                         placeholder="john@example.com"
                       />
                     </div>
                   </div>
 
                   {/* Contact & Company Row */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
-                      <label className="block text-sm font-semibold text-slate-300 mb-2">
+                      <label className="block text-xs sm:text-sm font-semibold text-slate-300 mb-1.5 sm:mb-2">
                         Phone <span className="text-cyan-400">*</span>
                       </label>
                       <input
@@ -549,12 +551,12 @@ export default function ConsultationModal({ isOpen, onClose }: ConsultationModal
                         value={formData.phone}
                         onChange={handleChange}
                         required
-                        className="input-field w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
+                        className="input-field w-full px-3 sm:px-4 py-2 sm:py-3 text-sm rounded-lg bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
                         placeholder="+1-234-567-8900"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-slate-300 mb-2">
+                      <label className="block text-xs sm:text-sm font-semibold text-slate-300 mb-1.5 sm:mb-2">
                         Company <span className="text-cyan-400">*</span>
                       </label>
                       <input
@@ -563,16 +565,16 @@ export default function ConsultationModal({ isOpen, onClose }: ConsultationModal
                         value={formData.company}
                         onChange={handleChange}
                         required
-                        className="input-field w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
+                        className="input-field w-full px-3 sm:px-4 py-2 sm:py-3 text-sm rounded-lg bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
                         placeholder="Your Company"
                       />
                     </div>
                   </div>
 
                   {/* Role & DateTime Row */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
-                      <label className="block text-sm font-semibold text-slate-300 mb-2">
+                      <label className="block text-xs sm:text-sm font-semibold text-slate-300 mb-1.5 sm:mb-2">
                         Your Role <span className="text-cyan-400">*</span>
                       </label>
                       <input
@@ -581,12 +583,12 @@ export default function ConsultationModal({ isOpen, onClose }: ConsultationModal
                         value={formData.role}
                         onChange={handleChange}
                         required
-                        className="input-field w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
+                        className="input-field w-full px-3 sm:px-4 py-2 sm:py-3 text-sm rounded-lg bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
                         placeholder="CTO / Founder"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-slate-300 mb-2">
+                      <label className="block text-xs sm:text-sm font-semibold text-slate-300 mb-1.5 sm:mb-2">
                         Preferred Date & Time <span className="text-cyan-400">*</span>
                       </label>
                       <input
@@ -595,21 +597,21 @@ export default function ConsultationModal({ isOpen, onClose }: ConsultationModal
                         value={formData.preferredDateTime}
                         onChange={handleChange}
                         required
-                        className="input-field w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
+                        className="input-field w-full px-3 sm:px-4 py-2 sm:py-3 text-sm rounded-lg bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
                       />
                     </div>
                   </div>
 
                   {/* Timezone */}
                   <div>
-                    <label className="block text-sm font-semibold text-slate-300 mb-2">
+                    <label className="block text-xs sm:text-sm font-semibold text-slate-300 mb-1.5 sm:mb-2">
                       Timezone <span className="text-cyan-400">*</span>
                     </label>
                     <select
                       name="timezone"
                       value={formData.timezone}
                       onChange={handleChange}
-                      className="input-field w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700/50 text-white focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
+                      className="input-field w-full px-3 sm:px-4 py-2 sm:py-3 text-sm rounded-lg bg-slate-800/50 border border-slate-700/50 text-white focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
                     >
                       {TIMEZONES.map((tz) => (
                         <option key={tz} value={tz} className="bg-slate-900">
@@ -621,7 +623,7 @@ export default function ConsultationModal({ isOpen, onClose }: ConsultationModal
 
                   {/* About & Goals */}
                   <div>
-                    <label className="block text-sm font-semibold text-slate-300 mb-2">
+                    <label className="block text-xs sm:text-sm font-semibold text-slate-300 mb-1.5 sm:mb-2">
                       About Your Project <span className="text-cyan-400">*</span>
                     </label>
                     <textarea
@@ -629,14 +631,14 @@ export default function ConsultationModal({ isOpen, onClose }: ConsultationModal
                       value={formData.about}
                       onChange={handleChange}
                       required
-                      rows={3}
-                      className="input-field w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 resize-none"
+                      rows={2}
+                      className="input-field w-full px-3 sm:px-4 py-2 sm:py-3 text-sm rounded-lg bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 resize-none"
                       placeholder="Briefly describe your project, product, or service..."
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-slate-300 mb-2">
+                    <label className="block text-xs sm:text-sm font-semibold text-slate-300 mb-1.5 sm:mb-2">
                       Your Goals & Challenges <span className="text-cyan-400">*</span>
                     </label>
                     <textarea
@@ -644,48 +646,47 @@ export default function ConsultationModal({ isOpen, onClose }: ConsultationModal
                       value={formData.goals}
                       onChange={handleChange}
                       required
-                      rows={3}
-                      className="input-field w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 resize-none"
+                      rows={2}
+                      className="input-field w-full px-3 sm:px-4 py-2 sm:py-3 text-sm rounded-lg bg-slate-800/50 border border-slate-700/50 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 resize-none"
                       placeholder="What are your main goals and challenges?"
                     />
                   </div>
 
                   {/* Subscribe Checkbox */}
-                  <label className="flex items-start gap-3 cursor-pointer group p-4 rounded-lg hover:bg-slate-800/30 transition-colors">
+                  <label className="flex items-start gap-2 sm:gap-3 cursor-pointer group p-2 sm:p-3 rounded-lg hover:bg-slate-800/20 transition-colors">
                     <input
                       type="checkbox"
                       name="subscribed"
                       checked={formData.subscribed}
                       onChange={handleChange}
-                      className="w-5 h-5 rounded border border-slate-700/50 bg-slate-800/50 mt-0.5 cursor-pointer accent-cyan-500"
+                      className="w-4 h-4 sm:w-5 sm:h-5 rounded border border-slate-700/50 bg-slate-800/50 mt-1 cursor-pointer accent-cyan-500 flex-shrink-0"
                     />
-                    <span className="text-sm text-slate-300 group-hover:text-slate-200 transition-colors leading-relaxed">
-                      Keep me updated with architectural insights, case studies, and optimization
-                      tips
+                    <span className="text-xs sm:text-sm text-slate-300 group-hover:text-slate-200 transition-colors leading-relaxed">
+                      Keep me updated with architectural insights, case studies, and optimization tips
                     </span>
                   </label>
 
                   {/* Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-4 pb-2">
                     <button
                       type="button"
                       onClick={onClose}
-                      className="flex-1 px-5 py-3 rounded-lg border border-slate-700/50 text-slate-300 font-semibold hover:bg-slate-800/50 hover:border-slate-600/50 transition-all"
+                      className="flex-1 px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg border border-slate-700/50 text-slate-300 font-semibold hover:bg-slate-800/50 hover:border-slate-600/50 transition-all active:scale-95"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={loading}
-                      className="submit-button flex-1 px-5 py-3 rounded-lg bg-gradient-to-r from-emerald-500 to-cyan-500 text-black font-bold hover:from-emerald-400 hover:to-cyan-400 hover:shadow-lg hover:shadow-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                      className="submit-button flex-1 px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg bg-gradient-to-r from-emerald-500 to-cyan-500 text-black font-bold hover:from-emerald-400 hover:to-cyan-400 hover:shadow-lg hover:shadow-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 active:scale-95"
                     >
                       {loading ? (
                         <>
-                          <FiLoader size={20} className="animate-spin" />
-                          Submitting...
+                          <FiLoader size={16} className="animate-spin" />
+                          <span className="hidden sm:inline">Submitting...</span>
                         </>
                       ) : (
-                        "Schedule Consultation"
+                        <span>Schedule</span>
                       )}
                     </button>
                   </div>
