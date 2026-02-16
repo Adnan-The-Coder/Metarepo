@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import { FiX, FiLoader, FiCheck, FiAlertCircle } from "react-icons/fi";
+import { FiX, FiLoader, FiCheck, FiAlertCircle as FiAlertCircleIcon } from "react-icons/fi";
 
 interface ConsultationData {
   name: string;
@@ -397,7 +397,7 @@ export default function ConsultationModal({ isOpen, onClose }: ConsultationModal
                 className="close-button flex-shrink-0 p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-all active:scale-95"
                 aria-label="Close modal"
               >
-                <FiX size={24} className="w-6 h-6" />
+                {React.createElement(FiX as unknown as React.FC<React.SVGProps<SVGSVGElement>>, { width: 24, height: 24, className: "w-6 h-6" })}
               </button>
             </div>
 
@@ -434,7 +434,7 @@ export default function ConsultationModal({ isOpen, onClose }: ConsultationModal
                         </defs>
                       </svg>
                       <div className="success-icon w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border-2 border-emerald-400/40 flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                        <FiCheck className="text-emerald-400" size={40} />
+                        {React.createElement(FiCheck as unknown as React.FC<React.SVGProps<SVGSVGElement>>, { className: "text-emerald-400", width: 40, height: 40 })}
                       </div>
                     </div>
                   </div>
@@ -502,7 +502,9 @@ export default function ConsultationModal({ isOpen, onClose }: ConsultationModal
                   {/* Error Message */}
                   {status === "error" && (
                     <div className="flex items-start gap-3 p-3 sm:p-4 rounded-lg bg-red-500/10 border border-red-500/30 backdrop-blur-sm">
-                      <FiAlertCircle className="text-red-400 flex-shrink-0 mt-0.5 w-5 h-5 sm:w-6 sm:h-6" />
+                      {React.createElement(FiAlertCircleIcon as unknown as React.FC<React.SVGProps<SVGSVGElement>>, {
+                        className: "text-red-400 flex-shrink-0 mt-0.5 w-5 h-5 sm:w-6 sm:h-6"
+                      })}
                       <p className="text-xs sm:text-sm text-red-300">{errorMessage}</p>
                     </div>
                   )}
@@ -682,7 +684,7 @@ export default function ConsultationModal({ isOpen, onClose }: ConsultationModal
                     >
                       {loading ? (
                         <>
-                          <FiLoader size={16} className="animate-spin" />
+                          {React.createElement(FiLoader as unknown as React.FC<React.SVGProps<SVGSVGElement>>, { width: 16, height: 16, className: "animate-spin" })}
                           <span className="hidden sm:inline">Submitting...</span>
                         </>
                       ) : (
