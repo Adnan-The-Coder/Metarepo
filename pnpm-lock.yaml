@@ -100,6 +100,37 @@ importers:
         specifier: ^5.0.4
         version: 5.33.0(typanion@3.14.0)
 
+  apps/admin-web:
+    dependencies:
+      next:
+        specifier: 15.3.3
+        version: 15.3.3(@babel/core@7.28.4)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react:
+        specifier: ^19.0.0
+        version: 19.1.0
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.1.0(react@19.1.0)
+    devDependencies:
+      '@tailwindcss/postcss':
+        specifier: ^4
+        version: 4.1.4
+      '@types/node':
+        specifier: ^20
+        version: 20.19.15
+      '@types/react':
+        specifier: ^19
+        version: 19.0.10
+      '@types/react-dom':
+        specifier: ^19
+        version: 19.0.4(@types/react@19.0.10)
+      tailwindcss:
+        specifier: ^4
+        version: 4.1.4
+      typescript:
+        specifier: ^5
+        version: 5.9.2
+
   apps/cf-server:
     dependencies:
       '@cloudflare/workers-types':

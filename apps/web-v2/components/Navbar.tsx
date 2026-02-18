@@ -24,7 +24,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [consultationModalOpen, setConsultationModalOpen] = useState(false);
   const controls = useAnimation();
-  const navOffset = 88; // fixed header height for scroll positioning
+  const navOffset = 88;
 
   // Scroll-based header state only (no section detection to avoid jank)
   useEffect(() => {
