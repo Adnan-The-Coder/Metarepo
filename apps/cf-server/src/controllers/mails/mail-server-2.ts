@@ -26,7 +26,7 @@ export const mail_server_2 = async (c: Context) => {
         notify: body.notify || undefined,
       } as Record<string, any>;
 
-      const results = await mailService.sendBookingEmails(payload);
+      const results = await mailService.sendBookingEmails(payload, c.env);
       return c.json({ success: true, results }, { status: 200 });
     }
 
@@ -41,7 +41,9 @@ export const mail_server_2 = async (c: Context) => {
         html: rendered,
         fromName,
         fromAddress,
-      });
+        apiKey: c.env.RESEND_API_KEY,
+      },
+      );
       return c.json({ success: true, result: resp }, { status: 200 });
     }
 
@@ -53,6 +55,7 @@ export const mail_server_2 = async (c: Context) => {
         html,
         fromName: fromName || "AdnanTheCoder",
         fromAddress: fromAddress || "hello@adnanthecoder.com",
+        apiKey: c.env.RESEND_API_KEY,
       });
       return c.json({ success: true, result: resp }, { status: 200 });
     }

@@ -54,18 +54,26 @@ app.use("*", (c, next) => {
 const ALLOWED_ORIGINS = new Set([
   "http://localhost:3000",
   "http://localhost:3002",
-  "https://AdnanTheCoder.com",
+  "https://adnanthecoder.com",
 ]);
 
 app.use(
   "*",
   cors({
     origin: (origin) => {
+      if (!origin) return "*";
+
+      const lower = origin.toLowerCase();
+
       // Allow all Vercel preview deployments
-      if (origin && (origin.includes('.vercel.app') || origin.includes('.pages.dev'))) {
+      if (lower.includes('.pages.dev')) {
         return origin;
       }
-      return !origin || ALLOWED_ORIGINS.has(origin) ? origin ?? "*" : "";
+
+      // Allow exact matches (case-insensitive)
+      if (ALLOWED_ORIGINS.has(lower)) return origin;
+
+      return "";
     },
     allowHeaders: ["Content-Type", "Authorization", "X-Access-Token"],
     allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],

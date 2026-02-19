@@ -22,6 +22,7 @@ export interface CloudflareBindings {
   RAZORPAY_LIVE_KEY_ID?: string;
   RAZORPAY_LIVE_KEY_SECRET?: string;
 
+  RESEND_API_KEY?: string;
 
   // Database binding
   DB?: any;

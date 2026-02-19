@@ -1,15 +1,11 @@
 import { Resend } from "resend";
 import TEMPLATES from "../templates/templates";
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "contact@adnanthecoder.com";
-const FROM_NAME = process.env.MAIL_FROM_NAME || "Adnan";
-const FROM_ADDRESS = process.env.MAIL_FROM_ADDRESS || "hello@adnanthecoder.com";
-
-const resend = new Resend(RESEND_API_KEY);
+const DEFAULT_ADMIN_EMAIL = "contact@adnanthecoder.com";
+const DEFAULT_FROM_NAME = "Adnan";
+const DEFAULT_FROM_ADDRESS = "hello@adnanthecoder.com";
 
 async function loadTemplate(name: string) {
-  // Prefer built-in templates (serverless-friendly). Fall back to key lookup.
   const key = name.endsWith(".html") ? name : `${name}.html`;
   const tpl = TEMPLATES[key];
   if (tpl) return tpl;
@@ -34,17 +30,22 @@ export async function sendMail({
   html,
   fromName,
   fromAddress,
+  apiKey,
 }: {
   to: string | string[];
   subject: string;
   html: string;
   fromName?: string;
   fromAddress?: string;
+  apiKey?: string; // Resend API key (from env bindings)
 }) {
-  const from = `${fromName || FROM_NAME} <${fromAddress || FROM_ADDRESS}>`;
+  const key = apiKey || "";
+  if (!key) throw new Error("Missing RESEND API key");
+  const resend = new Resend(key);
+
+  const from = `${fromName || DEFAULT_FROM_NAME} <${fromAddress || DEFAULT_FROM_ADDRESS}>`;
   const recipients = Array.isArray(to) ? to : [to];
 
-  // Resend accepts array of recipients
   const data = await resend.emails.send({
     from,
     to: recipients,
@@ -54,7 +55,7 @@ export async function sendMail({
   return data;
 }
 
-export async function sendBookingEmails(payload: Record<string, any>) {
+export async function sendBookingEmails(payload: Record<string, any>, env?: Record<string, any>) {
   // payload expected to contain: name,email,company,role,preferredDateTime,timezone,bookingType,goals,about
   const userTpl = await loadTemplate("booking-user.html");
   const adminTpl = await loadTemplate("booking-admin.html");
@@ -64,22 +65,33 @@ export async function sendBookingEmails(payload: Record<string, any>) {
 
   const emailPromises: Promise<any>[] = [];
 
+  const apiKey = env?.RESEND_API_KEY || env?.RESEND_KEY || "";
+  const adminEmail = env?.ADMIN_EMAIL || DEFAULT_ADMIN_EMAIL;
+  const fromName = env?.MAIL_FROM_NAME || DEFAULT_FROM_NAME;
+  const fromAddress = env?.MAIL_FROM_ADDRESS || DEFAULT_FROM_ADDRESS;
+
   if (payload.email) {
     emailPromises.push(sendMail({
       to: payload.email,
       subject: `Booking confirmation — ${payload.bookingType || "Consultation"}`,
       html: userHtml,
+      fromName,
+      fromAddress,
+      apiKey,
     }));
   }
 
   // Notify admin + cc other recipients if provided
-  const adminRecipients = [ADMIN_EMAIL];
+  const adminRecipients = [adminEmail];
   if (payload.notify && Array.isArray(payload.notify)) adminRecipients.push(...payload.notify);
 
   emailPromises.push(sendMail({
     to: adminRecipients,
     subject: `New booking: ${payload.name || "(unknown)"} — ${payload.bookingType || "Consultation"}`,
     html: adminHtml,
+    fromName,
+    fromAddress,
+    apiKey,
   }));
 
   const results = await Promise.allSettled(emailPromises);
