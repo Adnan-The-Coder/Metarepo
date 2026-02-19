@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback, type MouseEvent } from "react";
 import { motion, useAnimation } from "framer-motion";
-import ConsultationModal from "@/components/ConsultationModal";
+import Bookings from "@/components/Bookings";
 
 interface NavItem {
   label: string;
@@ -263,9 +263,10 @@ export default function Navbar() {
         </>
       )}
 
-      <ConsultationModal
+      <Bookings
         isOpen={consultationModalOpen}
         onClose={() => setConsultationModalOpen(false)}
+        bookingType="build-mvp"
       />
     </>
   );

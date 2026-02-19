@@ -2,7 +2,8 @@
 
 import Section from "@/components/ui/Section";
 import Card from "@/components/ui/Card";
-import { useMemo } from "react";
+import Bookings from "@/components/Bookings";
+import { useMemo, useState } from "react";
 import availabilityData from "@/data/availability.json";
 
 /* ─── Skill Card ─────────────────────────────────────────── */
@@ -87,6 +88,7 @@ function Stat({ value, label, accent }: { value: string; label: string; accent?:
 
 /* ─── Main ───────────────────────────────────────────────── */
 export default function AboutSection() {
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
   const yearsExp = useMemo(() => {
     const start = new Date("2021-01-01");
     const now = new Date();
@@ -107,7 +109,13 @@ export default function AboutSection() {
   }, []);
 
   return (
-    <Section id="about" title="">
+    <>
+      <Bookings
+        isOpen={bookingModalOpen}
+        onClose={() => setBookingModalOpen(false)}
+        bookingType="call-15"
+      />
+      <Section id="about" title="">
       <div className="relative px-4 sm:px-6 lg:px-10 py-14 sm:py-20 overflow-hidden">
 
         {/* Subtle grid */}
@@ -170,8 +178,8 @@ export default function AboutSection() {
 
               {/* CTAs */}
               <div className="flex flex-wrap items-center gap-3">
-                <a
-                  href="#contact"
+                <button
+                  onClick={() => setBookingModalOpen(true)}
                   className="group relative inline-flex items-center gap-2 overflow-hidden rounded-[3px] px-5 py-2.5 text-sm font-bold text-slate-900"
                   style={{ background: "linear-gradient(135deg,#22d3ee,#34d399)" }}
                 >
@@ -181,7 +189,7 @@ export default function AboutSection() {
                   <svg className="relative w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.8}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
                   </svg>
-                </a>
+                </button>
                 <a
                   href="#"
                   className="inline-flex items-center gap-2 rounded-[3px] border border-white/[0.08] px-5 py-2.5 text-sm font-semibold text-white/45 hover:border-white/[0.16] hover:text-white/70 transition-all duration-200"
@@ -267,5 +275,6 @@ export default function AboutSection() {
         }
       `}</style>
     </Section>
+    </>
   );
 }

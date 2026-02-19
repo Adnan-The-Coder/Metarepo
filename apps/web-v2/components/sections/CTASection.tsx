@@ -1,10 +1,19 @@
 "use client";
+import { useState } from "react";
 import Section from "@/components/ui/Section";
 import Link from "next/link";
+import Bookings from "@/components/Bookings";
 
 export default function CTASection() {
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
   return (
-    <Section id="contact" title="Turn Your Idea Into an MVP" subtitle="Ship a working MVP in a week—get in touch">
+    <>
+      <Bookings
+        isOpen={bookingModalOpen}
+        onClose={() => setBookingModalOpen(false)}
+        bookingType="tech-discussion"
+      />
+      <Section id="contact" title="Turn Your Idea Into an MVP" subtitle="Ship a working MVP in a week—get in touch">
       <style jsx>{`
         @keyframes border-flow {
           0% { background-position: 0% 50%; }
@@ -410,7 +419,16 @@ export default function CTASection() {
           </p>
           
           <div className="buttons-container">
-            <Link href="mailto:contact@adnanthecoder.com" className="cta-button primary">
+            <button 
+              onClick={() => setBookingModalOpen(true)}
+              className="cta-button primary"
+            >
+              <span className="button-text">Schedule Architect Consultation</span>
+            </button>
+            <Link 
+              href="mailto:contact@adnanthecoder.com" 
+              className="cta-button secondary"
+            >
               <span className="button-text">Email Me</span>
             </Link>
             <Link 
@@ -424,5 +442,6 @@ export default function CTASection() {
         </div>
       </div>
     </Section>
+    </>
   );
 }
