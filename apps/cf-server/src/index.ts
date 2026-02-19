@@ -4,6 +4,7 @@ import { secureHeaders } from "hono/secure-headers";
 import { requestId } from "hono/request-id";
 import type { CloudflareBindings } from "./types";
 import consultRoutes from "./routes/consult";
+import mailRoute from "./routes/mail";
 
 interface HealthStatus {
   status: "healthy" | "unhealthy";
@@ -167,6 +168,7 @@ app.get("/message", (c) => {
 /* ------------------------- ROUTES ------------------------- */
 
 app.route("/consult", consultRoutes);
+app.route('/mail', mailRoute);
 
 
 export default app;

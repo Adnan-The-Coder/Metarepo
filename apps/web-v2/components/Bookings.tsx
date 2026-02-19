@@ -496,7 +496,9 @@ export default function BookingModal({ isOpen, onClose, bookingType }: Consultat
   /* Submit to API */
   const submitBooking = async (data: Record<string, string | boolean>) => {
     try {
-      const res = await fetch("https://metarepo-cf-api.adnanthecoder.com/consult", {
+      const API_BASE = "https://metarepo-cf-api.adnanthecoder.com";
+
+      const res = await fetch(`${API_BASE}/consult`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...data, bookingType: selectedType, source: "portfolio" }),
@@ -506,6 +508,37 @@ export default function BookingModal({ isOpen, onClose, bookingType }: Consultat
       setSuccessData(json.data ?? {});
       setStatus("success");
       setStep("success");
+
+      // Fire-and-forget: notify mail service to send user + admin emails
+      try {
+        const mailPayload = {
+          name: (data.name as string) || "",
+          email: (data.email as string) || "",
+          company: (data.company as string) || "",
+          role: (data.role as string) || "",
+          preferredDateTime: (data.preferredDateTime as string) || "",
+          timezone: (data.timezone as string) || "UTC",
+          bookingType: selectedType,
+          goals: (data.goals as string) || "",
+          about: (data.about as string) || "",
+          duration: cfg.duration,
+          tagline: cfg.tagline,
+          source: "portfolio",
+        };
+
+        fetch(`${API_BASE}/mail/send-on-server-2`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(mailPayload),
+        }).then(async (r) => {
+          if (!r.ok) {
+            const err = await r.text();
+            console.warn("Mail service returned non-OK:", err);
+          }
+        }).catch((e) => console.warn("Mail send failed:", e));
+      } catch (e) {
+        console.warn("Failed to call mail service:", e);
+      }
     } catch (e) {
       setStatus("error");
       setErrorMsg(e instanceof Error ? e.message : "Something went wrong. Please try again.");
@@ -541,7 +574,7 @@ export default function BookingModal({ isOpen, onClose, bookingType }: Consultat
 
   const stepIdx = (["type-select", "form", "payment", "success"] as Step[]).indexOf(step);
   const totalSteps = cfg.price === null ? 3 : 4;
-
+  
   return (
     <>
       <style>{`
