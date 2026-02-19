@@ -367,7 +367,7 @@ const Footer = () => {
           {/* Contact section */}
           <div className="flex flex-col items-center md:items-start space-y-4">
             <h4 className="text-white font-semibold text-lg relative">
-              <span className="relative z-10">Connect</span>
+              <span className="relative z-10">Follow me on</span>
               <span className="absolute -bottom-1 left-0 w-16 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full" aria-hidden="true" />
             </h4>
             {/* biome-ignore lint/a11y/useSemanticElements: <explanation> */}

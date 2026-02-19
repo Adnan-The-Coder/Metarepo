@@ -3,9 +3,79 @@ import { useState } from "react";
 import Section from "@/components/ui/Section";
 import Link from "next/link";
 import Bookings from "@/components/Bookings";
+import { FiMail, FiArrowRight, FiCalendar, FiClock, FiZap, FiLinkedin } from "react-icons/fi";
 
+/* ─── Stat pill ──────────────────────────────────────────── */
+function StatPill({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="group flex flex-col items-center gap-0.5 px-5 py-4 border-r border-white/[0.05] last:border-r-0">
+      <span className="font-mono text-[1.35rem] font-black text-white leading-none group-hover:text-cyan-300 transition-colors duration-200">
+        {value}
+      </span>
+      <span className="text-[9px] uppercase tracking-[0.18em] text-white/24 font-semibold">{label}</span>
+    </div>
+  );
+}
+
+/* ─── Quick option card ──────────────────────────────────── */
+function QuickOption({
+  icon, label, sub, badge,
+  accentFrom, accentTo,
+  onClick, href, external,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  sub: string;
+  badge?: string;
+  accentFrom: string;
+  accentTo: string;
+  onClick?: () => void;
+  href?: string;
+  external?: boolean;
+}) {
+  const cls =
+    "group relative flex items-center gap-3.5 rounded-[3px] border border-white/[0.055] bg-white/[0.015] px-4 py-3.5 text-left overflow-hidden transition-all duration-200 hover:border-white/[0.12] hover:bg-white/[0.03] w-full";
+
+  const inner = (
+    <>
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300"
+        style={{ background: `radial-gradient(ellipse 80% 80% at 0% 50%, ${accentFrom}0d, transparent 65%)` }} />
+      <div className="absolute bottom-0 left-0 h-[1.5px] w-0 group-hover:w-full transition-all duration-500"
+        style={{ background: `linear-gradient(to right,${accentFrom},${accentTo})` }} />
+
+      <span className="shrink-0 flex items-center justify-center w-8 h-8 rounded-[3px] border text-sm transition-colors duration-200"
+        style={{ borderColor: `${accentFrom}28`, background: `${accentFrom}10`, color: accentFrom }}>
+        {icon}
+      </span>
+
+      <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+        <span className="text-[12px] font-bold text-white/72 group-hover:text-white/93 transition-colors leading-tight">{label}</span>
+        <span className="text-[10px] text-white/27 group-hover:text-white/42 transition-colors">{sub}</span>
+      </div>
+
+      <div className="flex items-center gap-2 shrink-0">
+        {badge && (
+          <span className="rounded-[2px] border px-2 py-0.5 text-[9px] font-black tracking-[0.12em] uppercase"
+            style={{ borderColor: `${accentFrom}30`, background: `${accentFrom}0d`, color: accentFrom }}>
+            {badge}
+          </span>
+        )}
+        <FiArrowRight size={12}
+          className="text-white/18 group-hover:text-white/50 group-hover:translate-x-0.5 transition-all duration-200" />
+      </div>
+    </>
+  );
+
+  if (href) {
+    return <Link href={href} target={external ? "_blank" : undefined} className={cls}>{inner}</Link>;
+  }
+  return <button onClick={onClick} className={cls}>{inner}</button>;
+}
+
+/* ─── Main ───────────────────────────────────────────────── */
 export default function CTASection() {
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
+
   return (
     <>
       <Bookings
@@ -13,435 +83,173 @@ export default function CTASection() {
         onClose={() => setBookingModalOpen(false)}
         bookingType="tech-discussion"
       />
-      <Section id="contact" title="Turn Your Idea Into an MVP" subtitle="Ship a working MVP in a week—get in touch">
-      <style jsx>{`
-        @keyframes border-flow {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
 
-        @keyframes glow-pulse {
-          0%, 100% { opacity: 0.4; }
-          50% { opacity: 0.8; }
-        }
+      <Section id="contact" title="">
+        <div className="relative px-4 sm:px-6 lg:px-10 py-14 sm:py-20 overflow-hidden">
 
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-5px); }
-        }
+          {/* Ambient glows */}
+          <div aria-hidden className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[280px] rounded-full bg-cyan-500/[0.05] blur-[120px]" />
+          <div aria-hidden className="pointer-events-none absolute bottom-0 left-0 w-[280px] h-[280px] rounded-full bg-emerald-500/[0.03] blur-[80px]" />
+          <div aria-hidden className="pointer-events-none absolute bottom-0 right-0 w-[240px] h-[240px] rounded-full bg-violet-500/[0.025] blur-[80px]" />
 
-        @keyframes shimmer {
-          0% { transform: translateX(-100%) rotate(45deg); }
-          100% { transform: translateX(200%) rotate(45deg); }
-        }
+          {/* Subtle grid */}
+          <div aria-hidden className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage: "linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(to right,rgba(255,255,255,0.02) 1px,transparent 1px)",
+              backgroundSize: "60px 60px",
+            }}
+          />
+          {/* Vignette */}
+          <div aria-hidden className="pointer-events-none absolute inset-0"
+            style={{ background: "radial-gradient(ellipse 90% 85% at 50% 50%, transparent 30%, #09090b 100%)" }} />
 
-        @keyframes fade-in-scale {
-          from {
-            opacity: 0;
-            transform: scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
+          <div className="relative max-w-5xl mx-auto flex flex-col gap-10 sm:gap-14">
 
-        @keyframes button-glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(6, 182, 212, 0.3); }
-          50% { box-shadow: 0 0 30px rgba(6, 182, 212, 0.5), 0 0 50px rgba(6, 182, 212, 0.3); }
-        }
+            {/* ── Section label ── */}
+            <div className="flex flex-col gap-2">
+              <span className="text-[9px] uppercase tracking-[0.24em] text-white/22 font-semibold">Get in Touch</span>
+              <h2 className="text-[1.7rem] sm:text-[2.2rem] font-black tracking-[-0.025em] text-white leading-[1.06]">
+                Your idea deserves{" "}
+                <span className="text-transparent bg-clip-text"
+                  style={{ backgroundImage: "linear-gradient(135deg,#22d3ee 0%,#34d399 100%)" }}>
+                  infrastructure that ships.
+                </span>
+              </h2>
+            </div>
 
-        .cta-container {
-          position: relative;
-          border-radius: 1rem;
-          padding: 3rem 2rem;
-          text-align: center;
-          background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.92) 100%);
-          overflow: hidden;
-          animation: fade-in-scale 0.8s ease-out;
-        }
-
-        @media (min-width: 768px) {
-          .cta-container {
-            padding: 3.5rem 4rem;
-          }
-        }
-
-        /* Animated neon border */
-        .cta-container::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          border-radius: 1rem;
-          padding: 2px;
-          background: linear-gradient(
-            45deg,
-            rgba(6, 182, 212, 0.6),
-            rgba(168, 85, 247, 0.6),
-            rgba(236, 72, 153, 0.6),
-            rgba(251, 146, 60, 0.6),
-            rgba(6, 182, 212, 0.6)
-          );
-          background-size: 300% 300%;
-          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor;
-          mask-composite: exclude;
-          animation: border-flow 4s ease infinite;
-          opacity: 0.8;
-        }
-
-        /* Radial glow background */
-        .cta-container::after {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          width: 150%;
-          height: 150%;
-          transform: translate(-50%, -50%);
-          background: radial-gradient(
-            circle,
-            rgba(6, 182, 212, 0.12) 0%,
-            rgba(168, 85, 247, 0.08) 40%,
-            transparent 70%
-          );
-          animation: glow-pulse 4s ease-in-out infinite;
-          pointer-events: none;
-        }
-
-        /* Diagonal pattern overlay */
-        .pattern-overlay {
-          position: absolute;
-          inset: 0;
-          opacity: 0.04;
-          background-image: 
-            repeating-linear-gradient(
-              45deg,
-              transparent,
-              transparent 15px,
-              rgba(255, 255, 255, 0.05) 15px,
-              rgba(255, 255, 255, 0.05) 30px
-            ),
-            repeating-linear-gradient(
-              -45deg,
-              transparent,
-              transparent 15px,
-              rgba(255, 255, 255, 0.05) 15px,
-              rgba(255, 255, 255, 0.05) 30px
-            );
-          pointer-events: none;
-        }
-
-        /* Grid pattern */
-        .grid-overlay {
-          position: absolute;
-          inset: 0;
-          opacity: 0.02;
-          background-image: 
-            linear-gradient(rgba(6, 182, 212, 0.3) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(6, 182, 212, 0.3) 1px, transparent 1px);
-          background-size: 50px 50px;
-          pointer-events: none;
-        }
-
-        /* Top accent line */
-        .top-accent {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 2px;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(6, 182, 212, 0.8),
-            rgba(168, 85, 247, 0.8),
-            transparent
-          );
-          animation: glow-pulse 3s ease-in-out infinite;
-        }
-
-        /* Corner accents */
-        .corner-glow {
-          position: absolute;
-          width: 100px;
-          height: 100px;
-          opacity: 0.3;
-          pointer-events: none;
-        }
-
-        .corner-glow.top-left {
-          top: 0;
-          left: 0;
-          background: radial-gradient(
-            circle at top left,
-            rgba(6, 182, 212, 0.4),
-            transparent 70%
-          );
-        }
-
-        .corner-glow.top-right {
-          top: 0;
-          right: 0;
-          background: radial-gradient(
-            circle at top right,
-            rgba(168, 85, 247, 0.4),
-            transparent 70%
-          );
-        }
-
-        .corner-glow.bottom-left {
-          bottom: 0;
-          left: 0;
-          background: radial-gradient(
-            circle at bottom left,
-            rgba(236, 72, 153, 0.4),
-            transparent 70%
-          );
-        }
-
-        .corner-glow.bottom-right {
-          bottom: 0;
-          right: 0;
-          background: radial-gradient(
-            circle at bottom right,
-            rgba(251, 146, 60, 0.4),
-            transparent 70%
-          );
-        }
-
-        .content-wrapper {
-          position: relative;
-          z-index: 1;
-        }
-
-        .cta-text {
-          color: #cbd5e1;
-          max-width: 42rem;
-          margin: 0 auto;
-          font-size: 1.125rem;
-          line-height: 1.75;
-          font-weight: 400;
-          text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .buttons-container {
-          margin-top: 2rem;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          gap: 1rem;
-        }
-
-        @media (min-width: 640px) {
-          .buttons-container {
-            flex-direction: row;
-          }
-        }
-
-        .cta-button {
-          position: relative;
-          padding: 0.875rem 2rem;
-          border-radius: 0.75rem;
-          font-weight: 700;
-          font-size: 1rem;
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          text-decoration: none;
-          overflow: hidden;
-          letter-spacing: 0.025em;
-        }
-
-        /* Primary button (Email) */
-        .cta-button.primary {
-          background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
-          color: #0f172a;
-          box-shadow: 
-            0 10px 30px rgba(255, 255, 255, 0.2),
-            0 0 0 1px rgba(255, 255, 255, 0.1),
-            inset 0 1px 0 rgba(255, 255, 255, 0.3);
-        }
-
-        .cta-button.primary::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(6, 182, 212, 0.3),
-            transparent
-          );
-          transition: left 0.6s ease;
-        }
-
-        .cta-button.primary:hover {
-          background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
-          transform: translateY(-3px);
-          box-shadow: 
-            0 15px 40px rgba(255, 255, 255, 0.3),
-            0 0 0 1px rgba(255, 255, 255, 0.2),
-            inset 0 1px 0 rgba(255, 255, 255, 0.4);
-        }
-
-        .cta-button.primary:hover::before {
-          left: 100%;
-        }
-
-        .cta-button.primary:active {
-          transform: translateY(-1px);
-        }
-
-        /* Secondary button (LinkedIn) */
-        .cta-button.secondary {
-          background: rgba(6, 182, 212, 0.1);
-          color: #67e8f9;
-          border: 2px solid rgba(6, 182, 212, 0.4);
-          position: relative;
-        }
-
-        .cta-button.secondary::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          border-radius: 0.75rem;
-          background: linear-gradient(
-            135deg,
-            rgba(6, 182, 212, 0.2),
-            rgba(168, 85, 247, 0.2)
-          );
-          opacity: 0;
-          transition: opacity 0.4s ease;
-        }
-
-        .cta-button.secondary::after {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          width: 0;
-          height: 0;
-          border-radius: 50%;
-          background: rgba(6, 182, 212, 0.3);
-          transform: translate(-50%, -50%);
-          transition: width 0.6s ease, height 0.6s ease;
-        }
-
-        .cta-button.secondary:hover {
-          border-color: rgba(6, 182, 212, 0.7);
-          color: #a5f3fc;
-          transform: translateY(-3px);
-          box-shadow: 
-            0 15px 40px rgba(6, 182, 212, 0.4),
-            0 0 30px rgba(6, 182, 212, 0.3),
-            inset 0 0 20px rgba(6, 182, 212, 0.1);
-        }
-
-        .cta-button.secondary:hover::before {
-          opacity: 1;
-        }
-
-        .cta-button.secondary:hover::after {
-          width: 300px;
-          height: 300px;
-        }
-
-        .cta-button.secondary:active {
-          transform: translateY(-1px);
-        }
-
-        .button-text {
-          position: relative;
-          z-index: 1;
-        }
-
-        /* Floating particles effect */
-        .particle {
-          position: absolute;
-          width: 4px;
-          height: 4px;
-          background: rgba(6, 182, 212, 0.6);
-          border-radius: 50%;
-          pointer-events: none;
-          animation: float 6s ease-in-out infinite;
-        }
-
-        .particle:nth-child(1) {
-          top: 20%;
-          left: 10%;
-          animation-delay: 0s;
-        }
-
-        .particle:nth-child(2) {
-          top: 60%;
-          left: 85%;
-          animation-delay: 2s;
-        }
-
-        .particle:nth-child(3) {
-          top: 40%;
-          left: 15%;
-          animation-delay: 4s;
-          background: rgba(168, 85, 247, 0.6);
-        }
-
-        .particle:nth-child(4) {
-          top: 75%;
-          left: 90%;
-          animation-delay: 1s;
-          background: rgba(236, 72, 153, 0.6);
-        }
-      `}</style>
-
-      <div className="cta-container">
-        <div className="pattern-overlay"></div>
-        <div className="grid-overlay"></div>
-        <div className="top-accent"></div>
-        
-        <div className="corner-glow top-left"></div>
-        <div className="corner-glow top-right"></div>
-        <div className="corner-glow bottom-left"></div>
-        <div className="corner-glow bottom-right"></div>
-        
-        <div className="particle"></div>
-        <div className="particle"></div>
-        <div className="particle"></div>
-        <div className="particle"></div>
-
-        <div className="content-wrapper">
-          <p className="cta-text">
-            I help founders validate ideas quickly with production‑ready
-            serverless stacks and tasteful dark UI. Let's scope it and ship.
-          </p>
-          
-          <div className="buttons-container">
-            <button 
-              onClick={() => setBookingModalOpen(true)}
-              className="cta-button primary"
+            {/* ── Main card ── */}
+            <div
+              className="relative rounded-[4px] border border-white/[0.06] overflow-hidden shadow-[0_20px_64px_rgba(0,0,0,0.5)]"
+              style={{ background: "linear-gradient(160deg,rgba(10,16,30,0.98),rgba(14,22,40,0.96))" }}
             >
-              <span className="button-text">Schedule Architect Consultation</span>
-            </button>
-            <Link 
-              href="mailto:contact@adnanthecoder.com" 
-              className="cta-button secondary"
-            >
-              <span className="button-text">Email Me</span>
-            </Link>
-            <Link 
-              href="https://www.linkedin.com/in/syedadnanali99" 
-              target="_blank" 
-              className="cta-button secondary"
-            >
-              <span className="button-text">Connect on LinkedIn</span>
-            </Link>
+              {/* Top accent bar */}
+              <div className="h-[1.5px] w-full"
+                style={{ background: "linear-gradient(to right,#22d3ee,#34d399)" }} />
+
+              {/* Inner top glow */}
+              <div aria-hidden className="pointer-events-none absolute -top-14 left-1/2 -translate-x-1/2 w-[380px] h-[160px] rounded-full bg-cyan-500/[0.06] blur-[56px]" />
+
+              <div className="relative grid grid-cols-1 lg:grid-cols-[1fr_300px] lg:divide-x lg:divide-white/[0.05]">
+
+                {/* ── Left: headline + body + CTA ── */}
+                <div className="flex flex-col gap-6 px-7 sm:px-10 py-9 sm:py-11">
+
+                  {/* Live status */}
+                  <div className="flex items-center gap-2">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-70" />
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
+                    </span>
+                    <span className="text-[9px] uppercase tracking-[0.2em] text-emerald-400 font-bold">
+                      Available · Remote-first
+                    </span>
+                  </div>
+
+                  {/* Body copy */}
+                  <p className="text-[0.9rem] text-white/40 leading-[1.9] max-w-[50ch]">
+                    I help founders validate ideas quickly with production-ready serverless stacks and
+                    clean backend architecture —{" "}
+                    <em className="not-italic text-white/58 font-medium">scoped tightly, delivered fast</em>,
+                    without the usual chaos.
+                  </p>
+
+                  {/* Short SEO/GEO/AEO-optimized description */}
+                  <p className="text-[0.9rem] text-white/36 leading-[1.6] max-w-[60ch] font-semibold">
+                    Schedule Architect is a 45‑minute priority planning call to kickstart your product
+                    build — startup-focused, remote-friendly, and delivery-first serverless architecture.
+                  </p>
+
+                  {/* Trust chips */}
+                  <div className="flex flex-wrap gap-2">
+                    {["No bloat", "Week-one delivery", "99.9% uptime SLA", "Timezone-flexible"].map((t) => (
+                      <span key={t}
+                        className="inline-flex items-center gap-1.5 rounded-[2px] border border-white/[0.06] bg-white/[0.02] px-2.5 py-1 text-[10px] font-semibold text-white/34 tracking-wide">
+                        <span className="w-1 h-1 rounded-full bg-emerald-400/55" />
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Primary CTA */}
+                  <button
+                    onClick={() => setBookingModalOpen(true)}
+                    className="group relative self-start inline-flex items-center gap-2 overflow-hidden rounded-[3px] px-6 py-3 text-[13px] font-black text-slate-900 transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+                    style={{ background: "linear-gradient(135deg,#22d3ee,#34d399)" }}
+                  >
+                    <FiCalendar size={13} />
+                    Schedule 45‑min Architect Call
+                    <FiArrowRight size={12} className="transition-transform group-hover:translate-x-0.5" />
+                  </button>
+
+                  <p className="text-[10px] text-white/20 font-medium -mt-2">
+                    45‑minute priority call · No retainers required · Pay per project · Cancel anytime
+                  </p>
+                </div>
+
+                {/* ── Right: quick options ── */}
+                <div className="flex flex-col border-t border-white/[0.05] lg:border-t-0">
+                  <div className="px-5 pt-6 pb-2.5">
+                    <span className="text-[9px] uppercase tracking-[0.2em] text-white/20 font-bold">
+                      Other ways to connect
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 px-4 pb-5 flex-1">
+                    <QuickOption
+                      icon={<FiClock size={13} />}
+                      label="Book a 15-min Call"
+                      sub="Quick fit check — no commitment"
+                      badge="Free"
+                      accentFrom="#60a5fa"
+                      accentTo="#22d3ee"
+                      onClick={() => setBookingModalOpen(true)}
+                    />
+                    {/* <QuickOption
+                      icon={<FiZap size={13} />}
+                      label="Call Immediately"
+                      sub="Priority direct line right now"
+                      badge="$10"
+                      accentFrom="#f59e0b"
+                      accentTo="#ef4444"
+                      onClick={() => setBookingModalOpen(true)}
+                    /> */}
+                    <QuickOption
+                      icon={<FiMail size={13} />}
+                      label="Send an Email"
+                      sub="contact@adnanthecoder.com"
+                      accentFrom="#a78bfa"
+                      accentTo="#22d3ee"
+                      href="mailto:contact@adnanthecoder.com"
+                    />
+                    <QuickOption
+                      icon={<FiLinkedin size={13} />}
+                      label="Connect on LinkedIn"
+                      sub="syedadnanali99"
+                      accentFrom="#34d399"
+                      accentTo="#22d3ee"
+                      href="https://www.linkedin.com/in/syedadnanali99"
+                      external
+                    />
+                  </div>
+
+                  {/* Response time note */}
+                  <div className="mt-auto px-5 py-3.5 border-t border-white/[0.04]">
+                    <p className="text-[9px] text-white/20 leading-relaxed">
+                      Responds within{" "}
+                      <span className="text-white/38 font-bold">4 hours</span> on weekdays.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom shimmer line */}
+              <div className="h-[1px] w-full"
+                style={{ background: "linear-gradient(to right,transparent,rgba(34,211,238,0.12),transparent)" }} />
+            </div>
+
           </div>
         </div>
-      </div>
-    </Section>
+      </Section>
     </>
   );
 }

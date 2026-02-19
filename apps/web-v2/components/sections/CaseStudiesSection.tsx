@@ -183,7 +183,7 @@ export default function CaseStudiesSection() {
               <h4 className="text-sm font-semibold text-cyan-300 uppercase tracking-wide">Performance Under Load</h4>
               <div className="space-y-4">
                 {[
-                  { metric: "API Latency (p99)", baseline: "2.8s", optimized: "980ms", gain: "65% ↓" },
+                  { metric: "API Latency", baseline: "2.8s", optimized: "980ms", gain: "65% ↓" },
                   { metric: "Throughput", baseline: "100 req/s", optimized: "400 req/s", gain: "4x ↑" },
                   { metric: "Cost per Request", baseline: "$0.002", optimized: "$0.0011", gain: "45% ↓" },
                   { metric: "Deployment Time", baseline: "6 hours", optimized: "15 min", gain: "24x ↓" },
@@ -207,7 +207,7 @@ export default function CaseStudiesSection() {
       </Card>
 
       {/* CTA */}
-      <div className="rounded-xl border brand-border bg-gradient-to-r from-slate-900/40 to-slate-900/20 p-6 md:p-8 text-center mt-8">
+      {/* <div className="rounded-xl border brand-border bg-gradient-to-r from-slate-900/40 to-slate-900/20 p-6 md:p-8 text-center mt-8">
         <h3 className="text-xl font-bold text-white mb-2">Ready to Scale Fearlessly?</h3>
         <p className="text-slate-300 mb-6 max-w-2xl mx-auto">
           Let's discuss your architecture challenges and how we can deliver measurable business impact.
@@ -218,7 +218,7 @@ export default function CaseStudiesSection() {
         >
           Schedule Architect Consultation
         </button>
-      </div>
+      </div> */}
     </Section>
 
     <ConsultationModal

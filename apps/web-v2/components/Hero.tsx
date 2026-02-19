@@ -449,7 +449,10 @@ const Hero = () => {
             <button className="px-6 py-3 rounded-lg bg-cyan-500 text-black font-semibold hover:bg-cyan-400 transition-all duration-300 shadow-lg shadow-cyan-500/25">
               Explore Projects
             </button>
-            <button className="px-6 py-3 rounded-lg border border-cyan-500/40 text-cyan-200 font-semibold hover:border-cyan-400/60 hover:text-white transition-all duration-300">
+            <button
+              onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+              className="px-6 py-3 rounded-lg border border-cyan-500/40 text-cyan-200 font-semibold hover:border-cyan-400/60 hover:text-white transition-all duration-300"
+            >
               Connect
             </button>
           </div>
@@ -532,18 +535,17 @@ const Hero = () => {
             </p>
 
             <div className="flex gap-6 mb-16">
-              <button className="px-10 py-4 rounded-lg bg-cyan-500 text-black font-semibold hover:bg-cyan-400 transition-all duration-300 hover:scale-105 shadow-lg shadow-cyan-500/25">
+              <button className="px-10 py-4 rounded-lg bg-cyan-500 text-black font-semibold hover:bg-cyan-400 transition-all duration-300 hover:scale-105 shadow-lg shadow-cyan-500/25" onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}>
                 Explore Projects
               </button>
-              <button className="px-10 py-4 rounded-lg border border-cyan-500/40 text-cyan-200 font-semibold hover:border-cyan-400/60 hover:text-white transition-all duration-300 hover:scale-105">
+              <button
+                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                className="px-10 py-4 rounded-lg border border-cyan-500/40 text-cyan-200 font-semibold hover:border-cyan-400/60 hover:text-white transition-all duration-300 hover:scale-105"
+              >
                 Connect
               </button>
             </div>
 
-            <div className="absolute bottom-8 flex flex-col items-center space-y-3 text-slate-500/60 animate-bounce">
-              <span className="text-xs font-mono">SCROLL</span>
-              <div className="w-px h-8 bg-gradient-to-b from-slate-500/60 to-transparent" />
-            </div>
           </div>
 
           {/* Right - Floating system stats */}
