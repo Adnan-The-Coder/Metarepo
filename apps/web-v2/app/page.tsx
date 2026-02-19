@@ -8,7 +8,7 @@ import ProjectsSection from "@/components/sections/ProjectsSection";
 import ExperienceSection from "@/components/sections/ExperienceSection";
 import CaseStudiesSection from "@/components/sections/CaseStudiesSection";
 import CTASection from "@/components/sections/CTASection";
-import Testimonials from "@/components/Testimonial";
+// import Testimonials from "@/components/Testimonial";
 
 export default function Home() {
 	return (
@@ -22,9 +22,9 @@ export default function Home() {
 		<ProjectsSection/>
 		{/* <SaaSSection/> */}
 		<ExperienceSection/>
-		<div id="testimonials">
+		{/* <div id="testimonials">
 			<Testimonials/>
-		</div>
+		</div> */}
 		<CaseStudiesSection/>
 		<CTASection/>
 		<Footer/>

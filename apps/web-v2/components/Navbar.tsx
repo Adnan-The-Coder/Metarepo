@@ -15,7 +15,7 @@ const navItems: NavItem[] = [
   { label: 'Projects', href: '#projects' },
   { label: 'SaaS', href: '#saas' },
   { label: 'Experience', href: '#experience' },
-  { label: 'Testimonials', href: '#testimonials' },
+  // { label: 'Testimonials', href: '#testimonials' },
 ];
 
 export default function Navbar() {
