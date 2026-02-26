@@ -56,6 +56,7 @@ const ALLOWED_ORIGINS = new Set([
   "http://localhost:3000",
   "http://localhost:3002",
   "https://adnanthecoder.com",
+  "https://result-analzed-at.ghost-server.workers.dev"
 ]);
 
 app.use(
