@@ -4,6 +4,7 @@ import OverviewTab from "@/components/OverviewTab";
 import ClasswiseTab from "@/components/ClasswiseTab";
 import SubjectwiseTab from "@/components/SubjectwiseTab";
 import PasspercentTab from "@/components/PasspercentTab";
+import { useOUResults } from "@/lib";
 import {
   GraduationCap,
   BarChart3,
@@ -87,10 +88,24 @@ const NavItem = ({
 const OsmaniaDashboard = () => {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  // Filters are now static
-  const selectedSem = "Semester 3";
-  const selectedYear = "February-2026";
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // Use the OU Results hook for live data
+  const {
+    semesterAnalytics,
+    selectedSemester,
+    setSelectedSemester,
+    availableSemesters,
+    isLoading,
+    loadingProgress,
+    error,
+    refetch,
+    clearCache,
+  } = useOUResults();
+  
+  // Computed values
+  const selectedSem = `Semester ${selectedSemester}`;
+  const selectedYear = "February-2026";
 
   const closeSidebar = () => setIsSidebarOpen(false);
 
@@ -277,7 +292,16 @@ const OsmaniaDashboard = () => {
 
 
               {/* Tab Content Components */}
-              {activeTab === "overview" && <OverviewTab />}
+              {activeTab === "overview" && (
+                <OverviewTab
+                  analytics={semesterAnalytics}
+                  isLoading={isLoading}
+                  loadingProgress={loadingProgress}
+                  error={error}
+                  selectedSemester={selectedSemester}
+                  onRefresh={refetch}
+                />
+              )}
               {activeTab === "classwise" && <ClasswiseTab />}
               {activeTab === "subjectwise" && <SubjectwiseTab searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}
               {activeTab === "passpercent" && <PasspercentTab />}
