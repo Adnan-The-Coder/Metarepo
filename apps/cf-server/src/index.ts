@@ -5,6 +5,7 @@ import { requestId } from "hono/request-id";
 import type { CloudflareBindings } from "./types";
 import consultRoutes from "./routes/consult";
 import mailRoute from "./routes/mail";
+import ouResultsRoutes from "./routes/ou-results";
 
 interface HealthStatus {
   status: "healthy" | "unhealthy";
@@ -177,6 +178,7 @@ app.get("/message", (c) => {
 
 app.route("/consult", consultRoutes);
 app.route('/mail', mailRoute);
+app.route("/ou-results", ouResultsRoutes);
 
 
 export default app;

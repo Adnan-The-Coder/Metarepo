@@ -34,3 +34,19 @@ export const portfolio_consultation_scheduling = sqliteTable(
       .default(sql`CURRENT_TIMESTAMP`)
   }
 );
+
+export const osmania_university_results_storage = sqliteTable(
+  "osmania_university_results_storage",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+
+    rollnumber: text("rollnumber").notNull(),
+    html_response: text("html_response").notNull().unique(),
+
+    result_release_month_year: text("result_release_month_year").notNull(),
+
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`)
+  }
+);
