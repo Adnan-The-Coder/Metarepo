@@ -3,38 +3,38 @@ import "./globals.css";
 import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "Syed Adnan Ali - Software Developer & Founder",
-  description: "Full-stack developer and founder of Electroplix, specializing in serverless architectures, web development, and AI integration with expertise in Next.js, React, TypeScript, and Python.",
-  keywords: "software developer, full-stack developer, serverless architecture, Cloudflare Workers, Next.js, React, TypeScript, Python, web development, Electroplix",
+  title: "OU Results Analytics | CSE Semester 3 - Feb 2026 | Osmania University",
+  description: "Live analytics dashboard for Osmania University B.E. Computer Science Semester 3 results (Feb 2026). Division-wise leaderboards, subject pass rates, grade distributions, and individual student performance - all data scraped live from official OU results.",
+  keywords: "Osmania University, OU results, CSE results, Semester 3, B.E. Computer Science, result analytics, SGPA, CGPA, pass percentage, grade distribution, division wise results, Hyderabad, Telangana, Feb 2026",
   authors: [
     {
       name: "Syed Adnan Ali",
-      url: "https://www.linkedin.com/in/syedadnanali99",
+      url: "https://adnanthecoder.com",
     },
   ],
   creator: "Syed Adnan Ali",
   publisher: "Syed Adnan Ali",
   openGraph: {
-    title: "Syed Adnan Ali - Software Developer & Founder of Electroplix",
-    description: "Full-stack developer specializing in serverless architectures, web development, and AI integration with expertise in Next.js, React, TypeScript, and Python.",
-    url: "https://adnanthecoder.com",
-    siteName: "Syed Adnan Ali Portfolio",
+    title: "OU Results Analytics | CSE Sem-3 Feb 2026",
+    description: "Live analytics for Osmania University CSE Semester 3 results. Division leaderboards, subject pass rates, grade breakdowns - data scraped from official OU portal.",
+    url: "https://metrics.ou-results.adnanthecoder.com",
+    siteName: "OU Results Analytics",
     images: [
       {
-        url: "/assets/electroplix_landingPage.png",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Syed Adnan Ali - Software Developer Portfolio",
+        alt: "OU Results Analytics Dashboard - CSE Semester 3",
       },
     ],
-    locale: "en_US",
+    locale: "en_IN",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Syed Adnan Ali - Software Developer & Founder",
-    description: "Full-stack developer specializing in serverless architectures, web development, and AI integration with expertise in Next.js, React, TypeScript, and Python.",
-    images: ["/assets/electroplix_landingPage.png"],
+    title: "OU Results Analytics | CSE Sem-3 Feb 2026",
+    description: "Live analytics for Osmania University CSE Semester 3 results. Division leaderboards, subject pass rates, grade breakdowns.",
+    images: ["/og-image.png"],
     creator: "@SyedAdnanAli",
   },
   robots: {
@@ -48,9 +48,9 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://adnanthecoder.com",
+    canonical: "https://metrics.ou-results.adnanthecoder.com",
   },
-  category: "technology",
+  category: "education",
 };
 
 export default function RootLayout({
@@ -71,37 +71,45 @@ export default function RootLayout({
         <Script id="schema-script" type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "Person",
-            name: "Syed Adnan Ali",
-            url: "https://adnanthecoder.com",
-            jobTitle: "Software Developer",
-            worksFor: {
-              "@type": "Organization",
-              name: "Electroplix",
-              url: "https://electroplix.com"
+            "@type": "WebApplication",
+            name: "OU Results Analytics",
+            url: "https://metrics.ou-results.adnanthecoder.com",
+            description: "Live analytics dashboard for Osmania University B.E. Computer Science Semester 3 results (Feb 2026)",
+            applicationCategory: "EducationalApplication",
+            operatingSystem: "Web Browser",
+            offers: {
+              "@type": "Offer",
+              price: "0",
+              priceCurrency: "INR"
             },
-            description: "Full-stack developer and founder of Electroplix, specializing in serverless architectures, web development, and AI integration.",
-            sameAs: [
-              "https://www.linkedin.com/in/syedadnanali99",
-              "https://github.com/Adnan-The-Coder"
-            ],
-            knowsAbout: [
-              "Web Development",
-              "Serverless Architecture",
-              "Cloudflare Workers",
-              "Next.js",
-              "React",
-              "TypeScript",
-              "Python",
-              "Node.js",
-              "API Development"
-            ],
-            alumniOf: {
+            creator: {
+              "@type": "Person",
+              name: "Syed Adnan Ali",
+              url: "https://adnanthecoder.com",
+              sameAs: [
+                "https://www.linkedin.com/in/syedadnanali99",
+                "https://github.com/Adnan-The-Coder"
+              ]
+            },
+            sourceOrganization: {
               "@type": "EducationalOrganization",
-              name: "Muffakham Jah College of Engineering & Technology",
-              sameAs: "https://mjcollege.ac.in/"
+              name: "Osmania University",
+              url: "https://osmania.ac.in",
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: "Hyderabad",
+                addressRegion: "Telangana",
+                addressCountry: "IN"
+              }
             },
-            image: "/assets/profile-image.jpg"
+            about: {
+              "@type": "Course",
+              name: "B.E. Computer Science Engineering",
+              provider: {
+                "@type": "EducationalOrganization",
+                name: "Osmania University"
+              }
+            }
           })}
         </Script>
       </body>

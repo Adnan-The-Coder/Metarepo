@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   BarChart3, BookOpen, Users, TrendingUp, ArrowRight,
   GraduationCap, CheckCircle2, Award, ChevronRight, ExternalLink,
-  Cpu,
+  Cpu, Shield, Database, RefreshCw,
 } from "lucide-react";
 
 // ── Animated Counter ──────────────────────────────────────────────────────────
@@ -215,6 +215,46 @@ export default function Page() {
         </div>
       </section>
 
+      {/* ── DATA SOURCE TRUST BANNER ────────────────────────────────────── */}
+      <section className="py-12 px-6 bg-gradient-to-r from-emerald-500/5 via-cyan-500/5 to-emerald-500/5 border-b border-zinc-800">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                <Shield size={24} className="text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-1">Official Data Source</p>
+                <p className="text-white font-semibold">100% Authentic Results</p>
+              </div>
+            </div>
+            
+            <div className="h-px md:h-12 w-full md:w-px bg-zinc-800 md:mx-4" />
+            
+            <div className="flex-1 text-center md:text-left">
+              <p className="text-zinc-400 text-sm leading-relaxed mb-2">
+                All data is <span className="text-cyan-400 font-semibold">scraped live</span> from the official Osmania University results portal:
+              </p>
+              <a 
+                href="https://osmania.ac.in/res07/20251290.jsp" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-800 border border-zinc-700 hover:border-cyan-500/50 hover:bg-zinc-700 transition-all group"
+              >
+                <Database size={14} className="text-cyan-400" />
+                <span className="text-cyan-400 font-mono text-sm">osmania.ac.in/res07/20251290.jsp</span>
+                <ExternalLink size={12} className="text-zinc-500 group-hover:text-cyan-400 transition-colors" />
+              </a>
+            </div>
+            
+            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-800/50 border border-zinc-700">
+              <RefreshCw size={14} className="text-emerald-400" />
+              <span className="text-zinc-400 text-xs">Auto-synced</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── DIVISIONS ───────────────────────────────────────────────────── */}
       <section className="py-20 px-6 border-b border-zinc-800">
         <div className="max-w-5xl mx-auto">
@@ -387,6 +427,55 @@ export default function Page() {
         </div>
       </section>
 
+      {/* ── DATA INTEGRITY SECTION ──────────────────────────────────────── */}
+      <section className="py-16 px-6 border-y border-zinc-800 bg-zinc-900/30">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6">
+            <Shield size={14} className="text-emerald-400" />
+            <span className="text-emerald-400 text-xs font-semibold">Data Integrity Guaranteed</span>
+          </div>
+          
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mb-4">
+            Scraped directly from OU Portal
+          </h2>
+          <p className="text-zinc-500 text-sm max-w-2xl mx-auto leading-relaxed mb-8">
+            Every result displayed is fetched in real-time from the official Osmania University examination results system. 
+            No manual entry. No errors. Just authentic data.
+          </p>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-5">
+              <Database size={20} className="text-cyan-400 mx-auto mb-3" />
+              <p className="text-white font-semibold text-sm">Live Scraping</p>
+              <p className="text-zinc-600 text-xs mt-1">Real-time data from OU servers</p>
+            </div>
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-5">
+              <Shield size={20} className="text-emerald-400 mx-auto mb-3" />
+              <p className="text-white font-semibold text-sm">100% Accurate</p>
+              <p className="text-zinc-600 text-xs mt-1">No manual data entry errors</p>
+            </div>
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-5">
+              <RefreshCw size={20} className="text-amber-400 mx-auto mb-3" />
+              <p className="text-white font-semibold text-sm">Auto Updated</p>
+              <p className="text-zinc-600 text-xs mt-1">Synced with latest results</p>
+            </div>
+          </div>
+          
+          <div className="mt-8 p-4 rounded-xl bg-zinc-800/50 border border-zinc-700 inline-block">
+            <p className="text-zinc-500 text-xs mb-2">Official Source URL:</p>
+            <a 
+              href="https://osmania.ac.in/res07/20251290.jsp" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors"
+            >
+              <span className="font-mono text-sm">https://osmania.ac.in/res07/20251290.jsp</span>
+              <ExternalLink size={12} />
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* ── CTA ─────────────────────────────────────────────────────────── */}
       <section className="py-20 px-6">
         <div className="max-w-3xl mx-auto">
@@ -412,27 +501,49 @@ export default function Page() {
 
       {/* ── FOOTER ──────────────────────────────────────────────────────── */}
       <footer className="border-t border-zinc-800 py-8 px-6">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md border border-cyan-500/20 bg-cyan-500/10 flex items-center justify-center">
-              <GraduationCap size={12} className="text-cyan-400" />
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md border border-cyan-500/20 bg-cyan-500/10 flex items-center justify-center">
+                <GraduationCap size={12} className="text-cyan-400" />
+              </div>
+              <span className="text-xs font-bold text-white tracking-tight">OU Results · CSE Sem-3</span>
             </div>
-            <span className="text-xs font-bold text-white tracking-tight">OU Results · CSE Sem-3</span>
+
+            <p className="text-[11px] text-zinc-700 text-center">
+              Osmania University · Hyderabad &nbsp;·&nbsp; Built by{" "}
+              <a href="https://AdnanTheCoder.com" target="_blank" rel="noreferrer"
+                className="text-zinc-500 hover:text-cyan-400 transition-colors font-medium">
+                Adnan (AdnanTheCoder.com)
+              </a>
+            </p>
+
+            <div className="flex items-center gap-4 text-[11px] text-zinc-700">
+              <a href="/dashboard" className="hover:text-white transition-colors flex items-center gap-1">
+                Dashboard <ExternalLink size={9} />
+              </a>
+              <a href="#" className="hover:text-white transition-colors">About</a>
+            </div>
           </div>
-
-          <p className="text-[11px] text-zinc-700 text-center">
-            Osmania University · Hyderabad &nbsp;·&nbsp; Built by{" "}
-            <a href="https://AdnanTheCoder.com" target="_blank" rel="noreferrer"
-              className="text-zinc-500 hover:text-cyan-400 transition-colors font-medium">
-              Adnan (AdnanTheCoder.com)
+          
+          {/* Data Source Footer Note */}
+          <div className="pt-4 border-t border-zinc-800/50 text-center">
+            <p className="text-[10px] text-zinc-600 mb-2">
+              Data sourced from official Osmania University examination portal
+            </p>
+            <a 
+              href="https://osmania.ac.in/res07/20251290.jsp" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-[10px] text-zinc-500 hover:text-cyan-400 transition-colors"
+            >
+              <Database size={10} />
+              <span className="font-mono">osmania.ac.in/res07/20251290.jsp</span>
+              <ExternalLink size={8} />
             </a>
-          </p>
-
-          <div className="flex items-center gap-4 text-[11px] text-zinc-700">
-            <a href="/dashboard" className="hover:text-white transition-colors flex items-center gap-1">
-              Dashboard <ExternalLink size={9} />
-            </a>
-            <a href="#" className="hover:text-white transition-colors">About</a>
+            <p className="text-[9px] text-zinc-700 mt-2">
+              This is an unofficial analytics tool. Not affiliated with Osmania University.
+            </p>
           </div>
         </div>
       </footer>
