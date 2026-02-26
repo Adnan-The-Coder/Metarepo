@@ -74,7 +74,7 @@ const SubjectPerformanceChart = ({ subjects }: { subjects: SubjectAnalytics[] })
   const sortedSubjects = [...subjects].sort((a, b) => a.passPercentage - b.passPercentage);
   
   return (
-    <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
+    <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1 sm:pr-2">
       {sortedSubjects.map((subject) => {
         const color = subject.passPercentage >= 80 ? "#10b981" 
           : subject.passPercentage >= 60 ? "#f59e0b" 
@@ -84,21 +84,21 @@ const SubjectPerformanceChart = ({ subjects }: { subjects: SubjectAnalytics[] })
         const isLab = subject.name.toLowerCase().includes("lab");
         
         return (
-          <div key={subject.code} className="flex items-center gap-3">
-            <span className={`text-[10px] font-mono w-12 flex-shrink-0 ${isLab ? "text-amber-400" : "text-cyan-400"}`}>
+          <div key={subject.code} className="flex items-center gap-2 sm:gap-3">
+            <span className={`text-[9px] sm:text-[10px] font-mono w-10 sm:w-12 flex-shrink-0 ${isLab ? "text-amber-400" : "text-cyan-400"}`}>
               {subject.code}
             </span>
-            <div className="flex-1">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] text-white truncate max-w-[180px]" title={subject.name}>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between mb-1 gap-2">
+                <span className="text-[10px] sm:text-[11px] text-white truncate" title={subject.name}>
                   {subject.name}
-                  {isLab && <span className="ml-1 text-amber-400 text-[9px]">(LAB)</span>}
+                  {isLab && <span className="ml-1 text-amber-400 text-[8px] sm:text-[9px]">(LAB)</span>}
                 </span>
-                <span className="text-[10px] text-[#6b6b6b]">
+                <span className="text-[9px] sm:text-[10px] text-[#6b6b6b] flex-shrink-0">
                   {subject.totalPassed}/{subject.totalAppeared}
                 </span>
               </div>
-              <div className="h-2 bg-[#1a1a1a] rounded-full overflow-hidden">
+              <div className="h-1.5 sm:h-2 bg-[#1a1a1a] rounded-full overflow-hidden">
                 <div 
                   className="h-full rounded-full transition-all duration-700"
                   style={{ width: `${subject.passPercentage}%`, background: color }}
@@ -106,7 +106,7 @@ const SubjectPerformanceChart = ({ subjects }: { subjects: SubjectAnalytics[] })
               </div>
             </div>
             <span 
-              className="text-[11px] font-semibold w-14 text-right flex-shrink-0"
+              className="text-[10px] sm:text-[11px] font-semibold w-12 sm:w-14 text-right flex-shrink-0"
               style={{ color }}
             >
               {subject.passPercentage.toFixed(1)}%
@@ -137,34 +137,34 @@ const SubjectGradeTable = ({ breakdown }: { breakdown: SubjectGradeBreakdown[] }
   return (
     <div>
       {/* Legend explaining what numbers mean */}
-      <div className="mb-4 p-3 bg-[#1a1a1a] rounded-lg">
-        <p className="text-[11px] text-[#8b8b8b]">
+      <div className="mb-4 p-2.5 sm:p-3 bg-[#1a1a1a] rounded-lg">
+        <p className="text-[10px] sm:text-[11px] text-[#8b8b8b]">
           <span className="text-white font-medium">Numbers = Student Count per Grade</span> · 
           Each cell shows how many students scored that grade in the subject
         </p>
-        <div className="flex flex-wrap gap-3 mt-2 text-[10px]">
-          <span><span style={{ color: gradeColors.S }} className="font-semibold">S</span> = 90-100% (Outstanding)</span>
+        <div className="flex flex-wrap gap-2 sm:gap-3 mt-2 text-[9px] sm:text-[10px]">
+          <span><span style={{ color: gradeColors.S }} className="font-semibold">S</span> = 90-100%</span>
           <span><span style={{ color: gradeColors.A }} className="font-semibold">A</span> = 80-89%</span>
           <span><span style={{ color: gradeColors.B }} className="font-semibold">B</span> = 70-79%</span>
           <span><span style={{ color: gradeColors.C }} className="font-semibold">C</span> = 60-69%</span>
           <span><span style={{ color: gradeColors.D }} className="font-semibold">D</span> = 50-59%</span>
           <span><span style={{ color: gradeColors.E }} className="font-semibold">E</span> = 40-49%</span>
-          <span><span style={{ color: gradeColors.F }} className="font-semibold">F</span> = Fail (&lt;40%)</span>
+          <span><span style={{ color: gradeColors.F }} className="font-semibold">F</span> = Fail</span>
         </div>
       </div>
       
-      <div className="overflow-x-auto">
-        <table className="w-full text-[11px]">
+      <div className="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0">
+        <table className="w-full text-[10px] sm:text-[11px] min-w-[500px]">
           <thead>
             <tr className="border-b border-[#222]">
-              <th className="text-left text-[#6b6b6b] font-medium py-2 px-2 min-w-[200px]">Subject</th>
-              <th className="text-center font-medium py-2 px-2 w-12" style={{ color: gradeColors.S }}>S</th>
-              <th className="text-center font-medium py-2 px-2 w-12" style={{ color: gradeColors.A }}>A</th>
-              <th className="text-center font-medium py-2 px-2 w-12" style={{ color: gradeColors.B }}>B</th>
-              <th className="text-center font-medium py-2 px-2 w-12" style={{ color: gradeColors.C }}>C</th>
-              <th className="text-center font-medium py-2 px-2 w-12" style={{ color: gradeColors.D }}>D</th>
-              <th className="text-center font-medium py-2 px-2 w-12" style={{ color: gradeColors.E }}>E</th>
-              <th className="text-center font-medium py-2 px-2 w-12" style={{ color: gradeColors.F }}>F</th>
+              <th className="text-left text-[#6b6b6b] font-medium py-2 px-1 sm:px-2 min-w-[140px] sm:min-w-[200px]">Subject</th>
+              <th className="text-center font-medium py-2 px-1 sm:px-2 w-8 sm:w-12" style={{ color: gradeColors.S }}>S</th>
+              <th className="text-center font-medium py-2 px-1 sm:px-2 w-8 sm:w-12" style={{ color: gradeColors.A }}>A</th>
+              <th className="text-center font-medium py-2 px-1 sm:px-2 w-8 sm:w-12" style={{ color: gradeColors.B }}>B</th>
+              <th className="text-center font-medium py-2 px-1 sm:px-2 w-8 sm:w-12" style={{ color: gradeColors.C }}>C</th>
+              <th className="text-center font-medium py-2 px-1 sm:px-2 w-8 sm:w-12" style={{ color: gradeColors.D }}>D</th>
+              <th className="text-center font-medium py-2 px-1 sm:px-2 w-8 sm:w-12" style={{ color: gradeColors.E }}>E</th>
+              <th className="text-center font-medium py-2 px-1 sm:px-2 w-8 sm:w-12" style={{ color: gradeColors.F }}>F</th>
             </tr>
           </thead>
           <tbody>
@@ -172,21 +172,21 @@ const SubjectGradeTable = ({ breakdown }: { breakdown: SubjectGradeBreakdown[] }
               const isLab = sub.name.toLowerCase().includes("lab");
               return (
                 <tr key={sub.code} className="border-b border-[#1a1a1a] hover:bg-[#1a1a1a]">
-                  <td className="py-3 px-2">
+                  <td className="py-2 sm:py-3 px-1 sm:px-2">
                     <div className="flex flex-col">
-                      <span className={`font-mono text-[12px] ${isLab ? "text-amber-400" : "text-cyan-400"}`}>
+                      <span className={`font-mono text-[11px] sm:text-[12px] ${isLab ? "text-amber-400" : "text-cyan-400"}`}>
                         {sub.code}
                       </span>
-                      <span className="text-[#9b9b9b] text-[10px] mt-0.5">{sub.name}</span>
+                      <span className="text-[#9b9b9b] text-[9px] sm:text-[10px] mt-0.5 truncate max-w-[130px] sm:max-w-none">{sub.name}</span>
                     </div>
                   </td>
-                  <td className="text-center py-3 px-2 text-white font-medium">{sub.sCount > 0 ? sub.sCount : "-"}</td>
-                  <td className="text-center py-3 px-2 text-white font-medium">{sub.aCount > 0 ? sub.aCount : "-"}</td>
-                  <td className="text-center py-3 px-2 text-white font-medium">{sub.bCount > 0 ? sub.bCount : "-"}</td>
-                  <td className="text-center py-3 px-2 text-white font-medium">{sub.cCount > 0 ? sub.cCount : "-"}</td>
-                  <td className="text-center py-3 px-2 text-white font-medium">{sub.dCount > 0 ? sub.dCount : "-"}</td>
-                  <td className="text-center py-3 px-2 text-white font-medium">{sub.eCount > 0 ? sub.eCount : "-"}</td>
-                  <td className="text-center py-3 px-2 text-rose-400 font-semibold">{sub.fCount > 0 ? sub.fCount : "-"}</td>
+                  <td className="text-center py-2 sm:py-3 px-1 sm:px-2 text-white font-medium">{sub.sCount > 0 ? sub.sCount : "-"}</td>
+                  <td className="text-center py-2 sm:py-3 px-1 sm:px-2 text-white font-medium">{sub.aCount > 0 ? sub.aCount : "-"}</td>
+                  <td className="text-center py-2 sm:py-3 px-1 sm:px-2 text-white font-medium">{sub.bCount > 0 ? sub.bCount : "-"}</td>
+                  <td className="text-center py-2 sm:py-3 px-1 sm:px-2 text-white font-medium">{sub.cCount > 0 ? sub.cCount : "-"}</td>
+                  <td className="text-center py-2 sm:py-3 px-1 sm:px-2 text-white font-medium">{sub.dCount > 0 ? sub.dCount : "-"}</td>
+                  <td className="text-center py-2 sm:py-3 px-1 sm:px-2 text-white font-medium">{sub.eCount > 0 ? sub.eCount : "-"}</td>
+                  <td className="text-center py-2 sm:py-3 px-1 sm:px-2 text-rose-400 font-semibold">{sub.fCount > 0 ? sub.fCount : "-"}</td>
                 </tr>
               );
             })}
@@ -345,10 +345,10 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
       </div>
 
       {/* Subject Grade Breakdown (Full Width) */}
-      <div className="bg-[#161616] border border-[#222222] rounded-2xl p-6">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-semibold text-white">Subject-wise Grade Breakdown</h2>
-          <span className="text-[11px] text-[#6b6b6b] bg-[#1a1a1a] px-2 py-1 rounded-lg">
+      <div className="bg-[#161616] border border-[#222222] rounded-xl sm:rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 sm:mb-5">
+          <h2 className="text-sm sm:text-base font-semibold text-white">Subject-wise Grade Breakdown</h2>
+          <span className="text-[10px] sm:text-[11px] text-[#6b6b6b] bg-[#1a1a1a] px-2 py-1 rounded-lg self-start sm:self-auto">
             Sem {selectedSemester} · All {subjectGradeBreakdown.length} Subjects
           </span>
         </div>
@@ -356,12 +356,12 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
       </div>
 
       {/* Subject Pass Rate (Full Width) */}
-      <div className="bg-[#161616] border border-[#222222] rounded-2xl p-6">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-semibold text-white">Subject Pass Rate (All {subjects.length} Subjects)</h2>
+      <div className="bg-[#161616] border border-[#222222] rounded-xl sm:rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 sm:mb-5">
+          <h2 className="text-sm sm:text-base font-semibold text-white">Subject Pass Rate (All {subjects.length} Subjects)</h2>
           <div className="flex items-center gap-2">
-            <span className="text-[9px] text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">Labs included</span>
-            <span className="text-[11px] text-[#6b6b6b] bg-[#1a1a1a] px-2 py-1 rounded-lg">
+            <span className="text-[8px] sm:text-[9px] text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">Labs included</span>
+            <span className="text-[10px] sm:text-[11px] text-[#6b6b6b] bg-[#1a1a1a] px-2 py-1 rounded-lg">
               {subjects.length} subjects
             </span>
           </div>
@@ -370,71 +370,74 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
       </div>
 
       {/* Additional Stats Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-[#161616] border border-[#222222] rounded-xl p-5">
-          <p className="text-[#6b6b6b] text-xs">Distinctions (≥8.5 SGPA)</p>
-          <p className="text-2xl font-bold text-amber-400 mt-1">{overviewStats.distinctionCount}</p>
-          <p className="text-[#6b6b6b] text-xs mt-1">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="bg-[#161616] border border-[#222222] rounded-xl p-4 sm:p-5">
+          <p className="text-[#6b6b6b] text-[10px] sm:text-xs">Distinctions (≥8.5 SGPA)</p>
+          <p className="text-xl sm:text-2xl font-bold text-amber-400 mt-1">{overviewStats.distinctionCount}</p>
+          <p className="text-[#6b6b6b] text-[10px] sm:text-xs mt-1">
             {((overviewStats.distinctionCount / overviewStats.totalStudents) * 100).toFixed(1)}% of total
           </p>
         </div>
-        <div className="bg-[#161616] border border-[#222222] rounded-xl p-5">
-          <p className="text-[#6b6b6b] text-xs">First Class (7.0-8.4)</p>
-          <p className="text-2xl font-bold text-emerald-400 mt-1">{overviewStats.firstClassCount}</p>
-          <p className="text-[#6b6b6b] text-xs mt-1">
+        <div className="bg-[#161616] border border-[#222222] rounded-xl p-4 sm:p-5">
+          <p className="text-[#6b6b6b] text-[10px] sm:text-xs">First Class (7.0-8.4)</p>
+          <p className="text-xl sm:text-2xl font-bold text-emerald-400 mt-1">{overviewStats.firstClassCount}</p>
+          <p className="text-[#6b6b6b] text-[10px] sm:text-xs mt-1">
             {((overviewStats.firstClassCount / overviewStats.totalStudents) * 100).toFixed(1)}% of total
           </p>
         </div>
-        <div className="bg-[#161616] border border-[#222222] rounded-xl p-5">
-          <p className="text-[#6b6b6b] text-xs">Second Class (5.0-6.9)</p>
-          <p className="text-2xl font-bold text-cyan-400 mt-1">{overviewStats.secondClassCount}</p>
-          <p className="text-[#6b6b6b] text-xs mt-1">
+        <div className="bg-[#161616] border border-[#222222] rounded-xl p-4 sm:p-5">
+          <p className="text-[#6b6b6b] text-[10px] sm:text-xs">Second Class (5.0-6.9)</p>
+          <p className="text-xl sm:text-2xl font-bold text-cyan-400 mt-1">{overviewStats.secondClassCount}</p>
+          <p className="text-[#6b6b6b] text-[10px] sm:text-xs mt-1">
             {((overviewStats.secondClassCount / overviewStats.totalStudents) * 100).toFixed(1)}% of total
           </p>
         </div>
-        <div className="bg-[#161616] border border-[#222222] rounded-xl p-5">
-          <p className="text-[#6b6b6b] text-xs">Average SGPA</p>
-          <p className="text-2xl font-bold text-white mt-1">{overviewStats.averageSGPA.toFixed(2)}</p>
-          <p className="text-[#6b6b6b] text-xs mt-1">
+        <div className="bg-[#161616] border border-[#222222] rounded-xl p-4 sm:p-5">
+          <p className="text-[#6b6b6b] text-[10px] sm:text-xs">Average SGPA</p>
+          <p className="text-xl sm:text-2xl font-bold text-white mt-1">{overviewStats.averageSGPA.toFixed(2)}</p>
+          <p className="text-[#6b6b6b] text-[10px] sm:text-xs mt-1">
             {overviewStats.averageSGPA >= 7 ? "Good performance" : overviewStats.averageSGPA >= 5 ? "Average" : "Needs improvement"}
           </p>
         </div>
       </div>
 
       {/* Bottom summary cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {hardestSubject && (
-          <div className="bg-[#161616] border border-[#222222] rounded-xl p-5 flex items-start gap-3">
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-rose-500/20 text-rose-400">
-              <AlertCircle size={18} />
+          <div className="bg-[#161616] border border-[#222222] rounded-xl p-4 sm:p-5 flex items-start gap-3">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-rose-500/20 text-rose-400">
+              <AlertCircle size={16} className="sm:hidden" />
+              <AlertCircle size={18} className="hidden sm:block" />
             </div>
-            <div>
-              <p className="text-[#6b6b6b] text-xs">Hardest Subject</p>
-              <p className="text-white font-semibold text-sm mt-0.5">{hardestSubject.code}</p>
-              <p className="text-[#6b6b6b] text-xs">{hardestSubject.passPercentage.toFixed(1)}% pass rate</p>
+            <div className="min-w-0">
+              <p className="text-[#6b6b6b] text-[10px] sm:text-xs">Hardest Subject</p>
+              <p className="text-white font-semibold text-xs sm:text-sm mt-0.5 truncate">{hardestSubject.code}</p>
+              <p className="text-[#6b6b6b] text-[10px] sm:text-xs">{hardestSubject.passPercentage.toFixed(1)}% pass rate</p>
             </div>
           </div>
         )}
         {easiestSubject && (
-          <div className="bg-[#161616] border border-[#222222] rounded-xl p-5 flex items-start gap-3">
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-emerald-500/20 text-emerald-400">
-              <Award size={18} />
+          <div className="bg-[#161616] border border-[#222222] rounded-xl p-4 sm:p-5 flex items-start gap-3">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-emerald-500/20 text-emerald-400">
+              <Award size={16} className="sm:hidden" />
+              <Award size={18} className="hidden sm:block" />
             </div>
-            <div>
-              <p className="text-[#6b6b6b] text-xs">Easiest Subject</p>
-              <p className="text-white font-semibold text-sm mt-0.5">{easiestSubject.code}</p>
-              <p className="text-[#6b6b6b] text-xs">{easiestSubject.passPercentage.toFixed(1)}% pass rate</p>
+            <div className="min-w-0">
+              <p className="text-[#6b6b6b] text-[10px] sm:text-xs">Easiest Subject</p>
+              <p className="text-white font-semibold text-xs sm:text-sm mt-0.5 truncate">{easiestSubject.code}</p>
+              <p className="text-[#6b6b6b] text-[10px] sm:text-xs">{easiestSubject.passPercentage.toFixed(1)}% pass rate</p>
             </div>
           </div>
         )}
-        <div className="bg-[#161616] border border-[#222222] rounded-xl p-5 flex items-start gap-3">
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-cyan-500/20 text-cyan-400">
-            <CheckCircle2 size={18} />
+        <div className="bg-[#161616] border border-[#222222] rounded-xl p-4 sm:p-5 flex items-start gap-3">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-cyan-500/20 text-cyan-400">
+            <CheckCircle2 size={16} className="sm:hidden" />
+            <CheckCircle2 size={18} className="hidden sm:block" />
           </div>
-          <div>
-            <p className="text-[#6b6b6b] text-xs">Analysis Status</p>
-            <p className="text-white font-semibold text-sm mt-0.5">Complete</p>
-            <p className="text-[#6b6b6b] text-xs">{overviewStats.totalStudents} records processed</p>
+          <div className="min-w-0">
+            <p className="text-[#6b6b6b] text-[10px] sm:text-xs">Analysis Status</p>
+            <p className="text-white font-semibold text-xs sm:text-sm mt-0.5">Complete</p>
+            <p className="text-[#6b6b6b] text-[10px] sm:text-xs">{overviewStats.totalStudents} records processed</p>
           </div>
         </div>
       </div>

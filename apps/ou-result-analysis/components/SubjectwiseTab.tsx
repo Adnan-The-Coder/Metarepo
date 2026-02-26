@@ -221,25 +221,25 @@ const SubjectwiseTab = ({
   if (error) return <ErrorState error={error} onRetry={onRefresh} />;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Search & Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
+      <div className="flex flex-col gap-3">
+        <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6b6b6b]" />
           <input
             type="text"
             placeholder="Search subject or code…"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full bg-[#161616] border border-[#222222] rounded-xl pl-9 pr-4 py-3 text-sm text-white placeholder-[#4b4b4b] outline-none focus:border-cyan-500/50 transition-colors"
+            className="w-full bg-[#161616] border border-[#222222] rounded-xl pl-9 pr-4 py-2.5 sm:py-3 text-sm text-white placeholder-[#4b4b4b] outline-none focus:border-cyan-500/50 transition-colors"
           />
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 overflow-x-auto pb-1">
           {(["all", "theory", "lab"] as SubjectType[]).map(type => (
             <button
               key={type}
               onClick={() => setSubjectType(type)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                 subjectType === type
                   ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30"
                   : "bg-[#161616] text-[#8b8b8b] border border-[#222222] hover:text-white"
@@ -253,120 +253,120 @@ const SubjectwiseTab = ({
 
       {/* Summary Cards */}
       {stats && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          <div className="bg-[#161616] border border-[#222222] rounded-xl p-4 text-center">
-            <p className="text-2xl font-bold text-white">{subjects.length}</p>
-            <p className="text-[#6b6b6b] text-xs mt-1">Total Subjects</p>
+        <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
+          <div className="bg-[#161616] border border-[#222222] rounded-xl p-3 sm:p-4 text-center">
+            <p className="text-lg sm:text-2xl font-bold text-white">{subjects.length}</p>
+            <p className="text-[#6b6b6b] text-[9px] sm:text-xs mt-1">Total Subjects</p>
           </div>
-          <div className="bg-[#161616] border border-[#222222] rounded-xl p-4 text-center">
-            <p className="text-2xl font-bold text-cyan-400">{stats.avgPassRate.toFixed(1)}%</p>
-            <p className="text-[#6b6b6b] text-xs mt-1">Avg Pass Rate</p>
+          <div className="bg-[#161616] border border-[#222222] rounded-xl p-3 sm:p-4 text-center">
+            <p className="text-lg sm:text-2xl font-bold text-cyan-400">{stats.avgPassRate.toFixed(1)}%</p>
+            <p className="text-[#6b6b6b] text-[9px] sm:text-xs mt-1">Avg Pass Rate</p>
           </div>
-          <div className="bg-[#161616] border border-[#222222] rounded-xl p-4 text-center">
-            <p className="text-2xl font-bold text-emerald-400">{stats.avgGradePoints.toFixed(1)}</p>
-            <p className="text-[#6b6b6b] text-xs mt-1">Avg Grade Points</p>
+          <div className="bg-[#161616] border border-[#222222] rounded-xl p-3 sm:p-4 text-center">
+            <p className="text-lg sm:text-2xl font-bold text-emerald-400">{stats.avgGradePoints.toFixed(1)}</p>
+            <p className="text-[#6b6b6b] text-[9px] sm:text-xs mt-1">Avg GP</p>
           </div>
-          <div className="bg-[#161616] border border-[#222222] rounded-xl p-4 text-center">
-            <p className="text-2xl font-bold text-rose-400">{stats.hardSubjects}</p>
-            <p className="text-[#6b6b6b] text-xs mt-1">Hard Subjects</p>
+          <div className="bg-[#161616] border border-[#222222] rounded-xl p-3 sm:p-4 text-center hidden sm:block">
+            <p className="text-lg sm:text-2xl font-bold text-rose-400">{stats.hardSubjects}</p>
+            <p className="text-[#6b6b6b] text-[9px] sm:text-xs mt-1">Hard Subjects</p>
           </div>
-          <div className="bg-[#161616] border border-[#222222] rounded-xl p-4 text-center">
-            <p className="text-2xl font-bold text-amber-400">{stats.labCount}</p>
-            <p className="text-[#6b6b6b] text-xs mt-1">Lab Practicals</p>
+          <div className="bg-[#161616] border border-[#222222] rounded-xl p-3 sm:p-4 text-center hidden lg:block">
+            <p className="text-lg sm:text-2xl font-bold text-amber-400">{stats.labCount}</p>
+            <p className="text-[#6b6b6b] text-[9px] sm:text-xs mt-1">Lab Practicals</p>
           </div>
-          <div className="bg-[#161616] border border-[#222222] rounded-xl p-4 text-center">
-            <p className="text-2xl font-bold text-violet-400">{subjects.length - stats.labCount}</p>
-            <p className="text-[#6b6b6b] text-xs mt-1">Theory Subjects</p>
+          <div className="bg-[#161616] border border-[#222222] rounded-xl p-3 sm:p-4 text-center hidden lg:block">
+            <p className="text-lg sm:text-2xl font-bold text-violet-400">{subjects.length - stats.labCount}</p>
+            <p className="text-[#6b6b6b] text-[9px] sm:text-xs mt-1">Theory Subjects</p>
           </div>
         </div>
       )}
 
       {/* Top/Bottom Performers */}
       {stats && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                <TrendingUp size={18} className="text-emerald-400" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-4 sm:p-5">
+            <div className="flex items-center gap-3 mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                <TrendingUp size={16} className="text-emerald-400" />
               </div>
-              <div>
-                <p className="text-[#8b8b8b] text-xs">Highest Pass Rate</p>
-                <p className="text-white font-semibold text-sm">{stats.highestPass.name}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-[#8b8b8b] text-[10px] sm:text-xs">Highest Pass Rate</p>
+                <p className="text-white font-semibold text-xs sm:text-sm truncate">{stats.highestPass.name}</p>
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-emerald-400 text-2xl font-bold">{stats.highestPass.passPercentage.toFixed(1)}%</span>
-              <span className="text-[10px] font-mono text-[#6b6b6b] bg-[#1f1f1f] px-2 py-1 rounded">{stats.highestPass.code}</span>
+              <span className="text-emerald-400 text-xl sm:text-2xl font-bold">{stats.highestPass.passPercentage.toFixed(1)}%</span>
+              <span className="text-[9px] sm:text-[10px] font-mono text-[#6b6b6b] bg-[#1f1f1f] px-2 py-1 rounded">{stats.highestPass.code}</span>
             </div>
           </div>
-          <div className="bg-gradient-to-br from-rose-500/10 to-rose-500/5 border border-rose-500/20 rounded-xl p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-rose-500/20 flex items-center justify-center">
-                <TrendingDown size={18} className="text-rose-400" />
+          <div className="bg-gradient-to-br from-rose-500/10 to-rose-500/5 border border-rose-500/20 rounded-xl p-4 sm:p-5">
+            <div className="flex items-center gap-3 mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-rose-500/20 flex items-center justify-center">
+                <TrendingDown size={16} className="text-rose-400" />
               </div>
-              <div>
-                <p className="text-[#8b8b8b] text-xs">Lowest Pass Rate</p>
-                <p className="text-white font-semibold text-sm">{stats.lowestPass.name}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-[#8b8b8b] text-[10px] sm:text-xs">Lowest Pass Rate</p>
+                <p className="text-white font-semibold text-xs sm:text-sm truncate">{stats.lowestPass.name}</p>
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-rose-400 text-2xl font-bold">{stats.lowestPass.passPercentage.toFixed(1)}%</span>
-              <span className="text-[10px] font-mono text-[#6b6b6b] bg-[#1f1f1f] px-2 py-1 rounded">{stats.lowestPass.code}</span>
+              <span className="text-rose-400 text-xl sm:text-2xl font-bold">{stats.lowestPass.passPercentage.toFixed(1)}%</span>
+              <span className="text-[9px] sm:text-[10px] font-mono text-[#6b6b6b] bg-[#1f1f1f] px-2 py-1 rounded">{stats.lowestPass.code}</span>
             </div>
           </div>
         </div>
       )}
 
       {/* Grade Distribution Legend */}
-      <div className="bg-[#161616] border border-[#222222] rounded-xl p-4">
-        <p className="text-xs font-semibold text-[#6b6b6b] uppercase tracking-wider mb-3">Grade Legend</p>
-        <div className="flex flex-wrap gap-3">
+      <div className="bg-[#161616] border border-[#222222] rounded-xl p-3 sm:p-4">
+        <p className="text-[10px] sm:text-xs font-semibold text-[#6b6b6b] uppercase tracking-wider mb-2 sm:mb-3">Grade Legend</p>
+        <div className="flex flex-wrap gap-2 sm:gap-3">
           {Object.entries(GRADE_COLORS).map(([grade, color]) => (
-            <div key={grade} className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-sm" style={{ background: color }} />
-              <span className="text-xs text-[#8b8b8b]">{grade}</span>
+            <div key={grade} className="flex items-center gap-1 sm:gap-1.5">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm" style={{ background: color }} />
+              <span className="text-[10px] sm:text-xs text-[#8b8b8b]">{grade}</span>
             </div>
           ))}
         </div>
       </div>
 
       {/* Subject Table */}
-      <div className="bg-[#161616] border border-[#222222] rounded-2xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-[#1f1f1f] flex items-center justify-between">
-          <h2 className="text-base font-semibold text-white flex items-center gap-2">
-            <BookOpen size={16} className="text-cyan-400" />
+      <div className="bg-[#161616] border border-[#222222] rounded-xl sm:rounded-2xl overflow-hidden">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-[#1f1f1f] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <h2 className="text-sm sm:text-base font-semibold text-white flex items-center gap-2">
+            <BookOpen size={14} className="text-cyan-400" />
             Subject-wise Results
           </h2>
-          <span className="text-[#6b6b6b] text-xs">{filteredSubjects.length} subjects</span>
+          <span className="text-[#6b6b6b] text-[10px] sm:text-xs">{filteredSubjects.length} subjects</span>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[600px]">
             <thead>
               <tr className="border-b border-[#1a1a1a]">
-                <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider whitespace-nowrap">
+                <th className="px-3 sm:px-5 py-2 sm:py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider whitespace-nowrap">
                   <button onClick={() => handleSort("name")} className="flex items-center hover:text-white transition-colors">
                     Subject <SortIcon active={sortKey === "name"} asc={sortAsc} />
                   </button>
                 </th>
-                <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider whitespace-nowrap">Code</th>
-                <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider whitespace-nowrap">Appeared</th>
-                <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider whitespace-nowrap">Passed</th>
-                <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider whitespace-nowrap">
+                <th className="px-3 sm:px-5 py-2 sm:py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider whitespace-nowrap">Code</th>
+                <th className="px-3 sm:px-5 py-2 sm:py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider whitespace-nowrap">Appeared</th>
+                <th className="px-3 sm:px-5 py-2 sm:py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider whitespace-nowrap">Passed</th>
+                <th className="px-3 sm:px-5 py-2 sm:py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider whitespace-nowrap">
                   <button onClick={() => handleSort("avgGradePoints")} className="flex items-center hover:text-white transition-colors">
                     Avg GP <SortIcon active={sortKey === "avgGradePoints"} asc={sortAsc} />
                   </button>
                 </th>
-                <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider whitespace-nowrap">
+                <th className="px-3 sm:px-5 py-2 sm:py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider whitespace-nowrap">
                   <button onClick={() => handleSort("difficulty")} className="flex items-center hover:text-white transition-colors">
                     Difficulty <SortIcon active={sortKey === "difficulty"} asc={sortAsc} />
                   </button>
                 </th>
-                <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider whitespace-nowrap min-w-[100px]">
+                <th className="px-3 sm:px-5 py-2 sm:py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider whitespace-nowrap min-w-[80px]">
                   <button onClick={() => handleSort("passRate")} className="flex items-center hover:text-white transition-colors">
                     Pass % <SortIcon active={sortKey === "passRate"} asc={sortAsc} />
                   </button>
                 </th>
-                <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider whitespace-nowrap min-w-[150px]">
+                <th className="px-3 sm:px-5 py-2 sm:py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider whitespace-nowrap min-w-[120px]">
                   Grade Distribution
                 </th>
               </tr>
@@ -383,24 +383,24 @@ const SubjectwiseTab = ({
                       className="border-b border-[#1a1a1a] last:border-0 hover:bg-[#1a1a1a]/50 transition-colors cursor-pointer"
                       onClick={() => setExpandedSubject(isExpanded ? null : row.code)}
                     >
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-2">
-                          <span className="text-white text-sm font-medium">{row.name}</span>
+                      <td className="px-3 sm:px-5 py-3 sm:py-4">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
+                          <span className="text-white text-xs sm:text-sm font-medium truncate max-w-[120px] sm:max-w-none">{row.name}</span>
                           {isLab && <LabBadge />}
                         </div>
                       </td>
-                      <td className="px-5 py-4">
-                        <span className="text-[11px] bg-[#1c2333] text-cyan-400 px-2 py-1 rounded-md font-mono">{row.code}</span>
+                      <td className="px-3 sm:px-5 py-3 sm:py-4">
+                        <span className="text-[10px] sm:text-[11px] bg-[#1c2333] text-cyan-400 px-1.5 sm:px-2 py-1 rounded-md font-mono">{row.code}</span>
                       </td>
-                      <td className="px-5 py-4 text-[#8b8b8b] text-sm">{row.totalAppeared.toLocaleString()}</td>
-                      <td className="px-5 py-4 text-emerald-400 text-sm font-medium">{row.totalPassed.toLocaleString()}</td>
-                      <td className="px-5 py-4">
-                        <span className="text-cyan-400 text-sm font-bold">{row.averageGradePoints.toFixed(1)}</span>
+                      <td className="px-3 sm:px-5 py-3 sm:py-4 text-[#8b8b8b] text-xs sm:text-sm">{row.totalAppeared.toLocaleString()}</td>
+                      <td className="px-3 sm:px-5 py-3 sm:py-4 text-emerald-400 text-xs sm:text-sm font-medium">{row.totalPassed.toLocaleString()}</td>
+                      <td className="px-3 sm:px-5 py-3 sm:py-4">
+                        <span className="text-cyan-400 text-xs sm:text-sm font-bold">{row.averageGradePoints.toFixed(1)}</span>
                       </td>
-                      <td className="px-5 py-4"><DiffBadge d={row.difficulty} /></td>
-                      <td className="px-5 py-4">
-                        <div className="space-y-1 min-w-[80px]">
-                          <span className={`text-sm font-bold ${row.passPercentage >= 80 ? "text-emerald-400" : row.passPercentage >= 70 ? "text-amber-400" : "text-rose-400"}`}>
+                      <td className="px-3 sm:px-5 py-3 sm:py-4"><DiffBadge d={row.difficulty} /></td>
+                      <td className="px-3 sm:px-5 py-3 sm:py-4">
+                        <div className="space-y-1 min-w-[60px] sm:min-w-[80px]">
+                          <span className={`text-xs sm:text-sm font-bold ${row.passPercentage >= 80 ? "text-emerald-400" : row.passPercentage >= 70 ? "text-amber-400" : "text-rose-400"}`}>
                             {row.passPercentage.toFixed(1)}%
                           </span>
                           <MiniBar 
@@ -409,7 +409,7 @@ const SubjectwiseTab = ({
                           />
                         </div>
                       </td>
-                      <td className="px-5 py-4 min-w-[150px]">
+                      <td className="px-3 sm:px-5 py-3 sm:py-4 min-w-[100px] sm:min-w-[150px]">
                         {breakdown && <GradeDistributionBar breakdown={breakdown} />}
                       </td>
                     </tr>
@@ -417,8 +417,8 @@ const SubjectwiseTab = ({
                     {/* Expanded Details */}
                     {isExpanded && breakdown && (
                       <tr className="bg-[#0f0f0f]">
-                        <td colSpan={8} className="px-5 py-4">
-                          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+                        <td colSpan={8} className="px-3 sm:px-5 py-3 sm:py-4">
+                          <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-3">
                             {[
                               { grade: "S", count: breakdown.sCount, label: "90-100%", color: GRADE_COLORS.S },
                               { grade: "A", count: breakdown.aCount, label: "70-89%", color: GRADE_COLORS.A },
@@ -429,17 +429,17 @@ const SubjectwiseTab = ({
                               { grade: "F", count: breakdown.fCount, label: "<40%", color: GRADE_COLORS.F },
                               { grade: "Ab", count: breakdown.abCount, label: "Absent", color: GRADE_COLORS.Ab },
                             ].map(g => (
-                              <div key={g.grade} className="bg-[#161616] border border-[#222222] rounded-lg p-3 text-center">
-                                <p className="text-xl font-bold" style={{ color: g.color }}>{g.count}</p>
-                                <p className="text-white text-xs font-semibold mt-0.5">{g.grade}</p>
-                                <p className="text-[#4b4b4b] text-[10px]">{g.label}</p>
-                                <p className="text-[#6b6b6b] text-[10px] mt-1">
+                              <div key={g.grade} className="bg-[#161616] border border-[#222222] rounded-lg p-2 sm:p-3 text-center">
+                                <p className="text-base sm:text-xl font-bold" style={{ color: g.color }}>{g.count}</p>
+                                <p className="text-white text-[10px] sm:text-xs font-semibold mt-0.5">{g.grade}</p>
+                                <p className="text-[#4b4b4b] text-[8px] sm:text-[10px]">{g.label}</p>
+                                <p className="text-[#6b6b6b] text-[8px] sm:text-[10px] mt-0.5">
                                   {((g.count / (breakdown.totalAppeared || 1)) * 100).toFixed(1)}%
                                 </p>
                               </div>
                             ))}
                           </div>
-                          <div className="mt-4 flex items-center gap-4 text-xs text-[#6b6b6b]">
+                          <div className="mt-3 sm:mt-4 flex flex-wrap items-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-[#6b6b6b]">
                             <span>Total Failed: <span className="text-rose-400 font-semibold">{row.totalFailed}</span></span>
                             <span>Total Absent: <span className="text-[#8b8b8b] font-semibold">{row.totalAbsent}</span></span>
                             <span>Pass Rate: <span className="text-emerald-400 font-semibold">{row.passPercentage.toFixed(1)}%</span></span>
@@ -463,27 +463,27 @@ const SubjectwiseTab = ({
       </div>
 
       {/* Subject Performance Chart */}
-      <div className="bg-[#161616] border border-[#222222] rounded-2xl p-6">
-        <h2 className="text-base font-semibold text-white flex items-center gap-2 mb-4">
-          <BarChart3 size={16} className="text-cyan-400" />
+      <div className="bg-[#161616] border border-[#222222] rounded-xl sm:rounded-2xl p-4 sm:p-6">
+        <h2 className="text-sm sm:text-base font-semibold text-white flex items-center gap-2 mb-4">
+          <BarChart3 size={14} className="text-cyan-400" />
           Pass Rate Comparison
         </h2>
-        <div className="space-y-3">
+        <div className="space-y-2.5 sm:space-y-3">
           {filteredSubjects.map(sub => {
             const passColor = sub.passPercentage >= 80 ? "#10b981" : sub.passPercentage >= 70 ? "#f59e0b" : "#ef4444";
             return (
               <div key={sub.code} className="group">
                 <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <span className="text-[10px] font-mono text-cyan-400 bg-[#1c2333] px-1.5 py-0.5 rounded flex-shrink-0">{sub.code}</span>
-                    <span className="text-xs text-white truncate">{sub.name}</span>
+                  <div className="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0">
+                    <span className="text-[9px] sm:text-[10px] font-mono text-cyan-400 bg-[#1c2333] px-1 sm:px-1.5 py-0.5 rounded flex-shrink-0">{sub.code}</span>
+                    <span className="text-[10px] sm:text-xs text-white truncate">{sub.name}</span>
                     {isLabSubject(sub.code, sub.name) && <LabBadge />}
                   </div>
-                  <span className="text-xs font-bold ml-2 flex-shrink-0" style={{ color: passColor }}>
+                  <span className="text-[10px] sm:text-xs font-bold ml-2 flex-shrink-0" style={{ color: passColor }}>
                     {sub.passPercentage.toFixed(1)}%
                   </span>
                 </div>
-                <div className="h-2 bg-[#1f1f1f] rounded-full overflow-hidden">
+                <div className="h-1.5 sm:h-2 bg-[#1f1f1f] rounded-full overflow-hidden">
                   <div 
                     className="h-full rounded-full transition-all duration-700 group-hover:opacity-80"
                     style={{ width: `${sub.passPercentage}%`, background: passColor }}

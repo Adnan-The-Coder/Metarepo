@@ -165,7 +165,7 @@ const StudentRow = ({ student, rank }: { student: StudentResult; rank: number })
                 <h4 className="text-xs font-semibold text-[#6b6b6b] uppercase mb-2">
                   Semester 3 Subjects ({sem3Subjects.length})
                 </h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
                   {sem3Subjects.map(sub => {
                     const gradeColor = sub.grade === "S" ? "text-cyan-400"
                       : sub.grade === "A" ? "text-emerald-400"
@@ -179,18 +179,18 @@ const StudentRow = ({ student, rank }: { student: StudentResult; rank: number })
                     return (
                       <div 
                         key={sub.code}
-                        className={`px-3 py-2 rounded-lg bg-[#1a1a1a] border ${
+                        className={`px-2 sm:px-3 py-2 rounded-lg bg-[#1a1a1a] border ${
                           sub.grade === "F" ? "border-rose-500/30" : "border-[#222]"
                         }`}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-cyan-400 font-mono text-[10px]">{sub.code}</span>
-                          <span className={`font-bold ${gradeColor}`}>{sub.grade}</span>
+                          <span className="text-cyan-400 font-mono text-[9px] sm:text-[10px]">{sub.code}</span>
+                          <span className={`font-bold text-sm ${gradeColor}`}>{sub.grade}</span>
                         </div>
-                        <p className="text-[9px] text-[#6b6b6b] mt-1 truncate" title={sub.name}>
+                        <p className="text-[8px] sm:text-[9px] text-[#6b6b6b] mt-1 truncate" title={sub.name}>
                           {sub.name}
                         </p>
-                        <p className="text-[10px] text-white mt-0.5">
+                        <p className="text-[9px] sm:text-[10px] text-white mt-0.5">
                           {sub.gradePoints >= 0 ? `${sub.gradePoints} pts` : "-"}
                         </p>
                       </div>
@@ -337,28 +337,29 @@ const ClasswiseTab: React.FC<ClasswiseTabProps> = ({
   }
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Division Filter */}
-      <div className="bg-gradient-to-r from-cyan-500/10 to-emerald-500/10 border border-cyan-500/20 rounded-xl p-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-gradient-to-r from-cyan-500/10 to-emerald-500/10 border border-cyan-500/20 rounded-xl p-3 sm:p-4">
+        <div className="flex flex-col gap-3 sm:gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-cyan-500/20 rounded-lg flex items-center justify-center">
-              <Users size={16} className="text-cyan-400" />
+            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-cyan-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Users size={14} className="sm:hidden text-cyan-400" />
+              <Users size={16} className="hidden sm:block text-cyan-400" />
             </div>
-            <div>
-              <p className="text-white font-semibold text-sm">CSE Division {selectedDivision}</p>
-              <p className="text-[#8b8b8b] text-xs">
-                Roll Numbers: 160424733{String(getDivisionRange(selectedDivision).start).padStart(3, "0")} - 160424733{String(getDivisionRange(selectedDivision).end).padStart(3, "0")}
+            <div className="min-w-0">
+              <p className="text-white font-semibold text-xs sm:text-sm">CSE Division {selectedDivision}</p>
+              <p className="text-[#8b8b8b] text-[10px] sm:text-xs truncate">
+                Roll: {String(getDivisionRange(selectedDivision).start).padStart(3, "0")} - {String(getDivisionRange(selectedDivision).end).padStart(3, "0")}
               </p>
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
             {DIVISIONS.map(div => (
               <button
                 key={div}
                 onClick={() => setSelectedDivision(div)}
-                className={`w-9 h-9 rounded-lg font-semibold text-sm transition-all ${
+                className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg font-semibold text-xs sm:text-sm transition-all ${
                   selectedDivision === div
                     ? "bg-cyan-500 text-white"
                     : "bg-[#1a1a1a] text-[#6b6b6b] hover:text-white hover:bg-[#222]"
@@ -372,69 +373,69 @@ const ClasswiseTab: React.FC<ClasswiseTabProps> = ({
       </div>
       
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        <div className="bg-[#161616] border border-[#222222] rounded-xl p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Users size={16} className="text-cyan-400" />
-            <span className="text-[#6b6b6b] text-xs">Students</span>
+      <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+        <div className="bg-[#161616] border border-[#222222] rounded-xl p-3 sm:p-4">
+          <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+            <Users size={14} className="text-cyan-400" />
+            <span className="text-[#6b6b6b] text-[9px] sm:text-xs">Students</span>
           </div>
-          <p className="text-2xl font-bold text-white">{divisionStats.total}</p>
+          <p className="text-lg sm:text-2xl font-bold text-white">{divisionStats.total}</p>
         </div>
         
-        <div className="bg-[#161616] border border-[#222222] rounded-xl p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <CheckCircle2 size={16} className="text-emerald-400" />
-            <span className="text-[#6b6b6b] text-xs">Passed</span>
+        <div className="bg-[#161616] border border-[#222222] rounded-xl p-3 sm:p-4">
+          <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+            <CheckCircle2 size={14} className="text-emerald-400" />
+            <span className="text-[#6b6b6b] text-[9px] sm:text-xs">Passed</span>
           </div>
-          <p className="text-2xl font-bold text-emerald-400">{divisionStats.passed}</p>
-          <p className="text-[#6b6b6b] text-xs">{divisionStats.passRate}%</p>
+          <p className="text-lg sm:text-2xl font-bold text-emerald-400">{divisionStats.passed}</p>
+          <p className="text-[#6b6b6b] text-[9px] sm:text-xs">{divisionStats.passRate}%</p>
         </div>
         
-        <div className="bg-[#161616] border border-[#222222] rounded-xl p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <AlertCircle size={16} className="text-amber-400" />
-            <span className="text-[#6b6b6b] text-xs">Promoted</span>
+        <div className="bg-[#161616] border border-[#222222] rounded-xl p-3 sm:p-4">
+          <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+            <AlertCircle size={14} className="text-amber-400" />
+            <span className="text-[#6b6b6b] text-[9px] sm:text-xs">Promoted</span>
           </div>
-          <p className="text-2xl font-bold text-amber-400">{divisionStats.promoted}</p>
+          <p className="text-lg sm:text-2xl font-bold text-amber-400">{divisionStats.promoted}</p>
         </div>
         
-        <div className="bg-[#161616] border border-[#222222] rounded-xl p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Award size={16} className="text-amber-400" />
-            <span className="text-[#6b6b6b] text-xs">Distinctions</span>
+        <div className="bg-[#161616] border border-[#222222] rounded-xl p-3 sm:p-4 hidden sm:block">
+          <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+            <Award size={14} className="text-amber-400" />
+            <span className="text-[#6b6b6b] text-[9px] sm:text-xs">Distinctions</span>
           </div>
-          <p className="text-2xl font-bold text-amber-400">{divisionStats.distinctions}</p>
+          <p className="text-lg sm:text-2xl font-bold text-amber-400">{divisionStats.distinctions}</p>
         </div>
         
-        <div className="bg-[#161616] border border-[#222222] rounded-xl p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <AlertCircle size={16} className="text-rose-400" />
-            <span className="text-[#6b6b6b] text-xs">Total Backlogs</span>
+        <div className="bg-[#161616] border border-[#222222] rounded-xl p-3 sm:p-4 hidden lg:block">
+          <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+            <AlertCircle size={14} className="text-rose-400" />
+            <span className="text-[#6b6b6b] text-[9px] sm:text-xs">Backlogs</span>
           </div>
-          <p className="text-2xl font-bold text-rose-400">{divisionStats.totalBacklogs}</p>
+          <p className="text-lg sm:text-2xl font-bold text-rose-400">{divisionStats.totalBacklogs}</p>
         </div>
       </div>
       
       {/* Leaderboard */}
-      <div className="bg-[#161616] border border-[#222222] rounded-2xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-[#1f1f1f] flex items-center justify-between">
+      <div className="bg-[#161616] border border-[#222222] rounded-xl sm:rounded-2xl overflow-hidden">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-[#1f1f1f] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <Award size={18} className="text-amber-400" />
-            <h2 className="text-base font-semibold text-white">Division {selectedDivision} Leaderboard</h2>
+            <Award size={16} className="text-amber-400" />
+            <h2 className="text-sm sm:text-base font-semibold text-white">Division {selectedDivision} Leaderboard</h2>
           </div>
-          <span className="text-[11px] text-[#6b6b6b]">Semester 3 · Sorted by SGPA</span>
+          <span className="text-[10px] sm:text-[11px] text-[#6b6b6b]">Semester 3 · Sorted by SGPA</span>
         </div>
         
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[500px]">
             <thead>
               <tr className="border-b border-[#1a1a1a]">
-                <th className="px-4 py-3 text-left text-[11px] font-semibold text-[#6b6b6b] uppercase">Rank</th>
-                <th className="px-4 py-3 text-left text-[11px] font-semibold text-[#6b6b6b] uppercase">Roll No.</th>
-                <th className="px-4 py-3 text-left text-[11px] font-semibold text-[#6b6b6b] uppercase">Name</th>
-                <th className="px-4 py-3 text-left text-[11px] font-semibold text-[#6b6b6b] uppercase">SGPA</th>
-                <th className="px-4 py-3 text-left text-[11px] font-semibold text-[#6b6b6b] uppercase">Backlogs</th>
-                <th className="px-4 py-3 text-left text-[11px] font-semibold text-[#6b6b6b] uppercase">Result</th>
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#6b6b6b] uppercase">Rank</th>
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#6b6b6b] uppercase">Roll No.</th>
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#6b6b6b] uppercase">Name</th>
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#6b6b6b] uppercase">SGPA</th>
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#6b6b6b] uppercase">Backlogs</th>
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-[10px] sm:text-[11px] font-semibold text-[#6b6b6b] uppercase">Result</th>
               </tr>
             </thead>
             <tbody>
@@ -455,17 +456,17 @@ const ClasswiseTab: React.FC<ClasswiseTabProps> = ({
       </div>
       
       {/* Subject Pass Rate Comparison - Semester 3 */}
-      <div className="bg-[#161616] border border-[#222222] rounded-2xl p-6">
-        <div className="flex items-center justify-between mb-5">
+      <div className="bg-[#161616] border border-[#222222] rounded-xl sm:rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 sm:mb-5">
           <div className="flex items-center gap-2">
-            <TrendingUp size={18} className="text-cyan-400" />
-            <h2 className="text-base font-semibold text-white">Semester 3 Subject Pass Rates</h2>
+            <TrendingUp size={16} className="text-cyan-400" />
+            <h2 className="text-sm sm:text-base font-semibold text-white">Semester 3 Subject Pass Rates</h2>
           </div>
-          <span className="text-[11px] text-[#6b6b6b]">Division {selectedDivision} · {subjects.length} subjects</span>
+          <span className="text-[10px] sm:text-[11px] text-[#6b6b6b]">Division {selectedDivision} · {subjects.length} subjects</span>
         </div>
         
         {/* Calculate division-specific pass rates */}
-        <div className="space-y-3">
+        <div className="space-y-2.5 sm:space-y-3">
           {Object.entries(SEMESTER_3_SUBJECTS).map(([code, name]) => {
             // Calculate pass rate for this subject in this division
             let appeared = 0;
@@ -485,16 +486,16 @@ const ClasswiseTab: React.FC<ClasswiseTabProps> = ({
             const isLab = name.toLowerCase().includes("lab");
             
             return (
-              <div key={code} className="flex items-center gap-3">
-                <span className={`text-[11px] font-mono w-12 flex-shrink-0 ${isLab ? "text-amber-400" : "text-cyan-400"}`}>
+              <div key={code} className="flex items-center gap-2 sm:gap-3">
+                <span className={`text-[9px] sm:text-[11px] font-mono w-8 sm:w-12 flex-shrink-0 ${isLab ? "text-amber-400" : "text-cyan-400"}`}>
                   {code}
                 </span>
-                <span className="text-[11px] text-[#8b8b8b] w-44 flex-shrink-0 truncate" title={name}>
+                <span className="hidden sm:block text-[11px] text-[#8b8b8b] w-44 flex-shrink-0 truncate" title={name}>
                   {name}
                 </span>
-                <div className="flex-1 h-5 bg-[#1a1a1a] rounded-md overflow-hidden">
+                <div className="flex-1 h-4 sm:h-5 bg-[#1a1a1a] rounded-md overflow-hidden">
                   <div 
-                    className="h-full rounded-md flex items-center justify-end px-2 transition-all duration-700"
+                    className="h-full rounded-md flex items-center justify-end px-1.5 sm:px-2 transition-all duration-700"
                     style={{
                       width: `${Math.max(passRate, 2)}%`,
                       background: passRate >= 80 
@@ -504,10 +505,10 @@ const ClasswiseTab: React.FC<ClasswiseTabProps> = ({
                         : "linear-gradient(90deg,#7f1d1d,#ef4444)"
                     }}
                   >
-                    <span className="text-[10px] font-bold text-white">{passRate.toFixed(1)}%</span>
+                    <span className="text-[9px] sm:text-[10px] font-bold text-white">{passRate.toFixed(1)}%</span>
                   </div>
                 </div>
-                <span className="text-[10px] text-[#6b6b6b] w-16 text-right">
+                <span className="text-[9px] sm:text-[10px] text-[#6b6b6b] w-10 sm:w-16 text-right flex-shrink-0">
                   {passed}/{appeared}
                 </span>
               </div>

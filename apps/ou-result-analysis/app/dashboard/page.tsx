@@ -14,8 +14,8 @@ import {
   ChevronRight,
   Menu,
   X,
-  Filter,
   Download,
+  FileDown,
 } from "lucide-react";
 
 // ─── Brand Logo ──────────────────────────────────────────────────────────────
@@ -29,6 +29,57 @@ const OULogo = () => (
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Tab = "overview" | "classwise" | "subjectwise" | "passpercent";
+
+// ─── CSV Export Function ─────────────────────────────────────────────────────
+const exportToCSV = (students: { rollnumber: string; name: string; subjects: { code: string; name: string; grade: string; credits: number }[]; semesterResults: { semester: number; result: string; sgpa: number | null }[] }[], filename: string, semester = 3) => {
+  if (!students.length) return;
+  
+  // Get all unique subject codes for column headers
+  const allSubjectCodes = new Set<string>();
+  students.forEach(s => s.subjects.forEach(sub => allSubjectCodes.add(sub.code)));
+  const subjectCodes = Array.from(allSubjectCodes).sort();
+  
+  // Build CSV content with individual subject columns
+  const headers = ["Roll Number", "Name", "Result", "SGPA", "Total Credits", ...subjectCodes];
+  const rows = students.map(s => {
+    const subjectGradeMap = new Map(s.subjects.map(sub => [sub.code, sub.grade]));
+    const totalCredits = s.subjects.reduce((sum, sub) => sum + sub.credits, 0);
+    const subjectGrades = subjectCodes.map(code => subjectGradeMap.get(code) || "-");
+    
+    // Get semester result
+    const semResult = s.semesterResults.find(sr => sr.semester === semester);
+    const result = semResult?.result || "-";
+    const sgpa = semResult?.sgpa?.toFixed(2) || "-";
+    
+    return [
+      s.rollnumber,
+      `"${s.name.replace(/"/g, '""')}"`, // Properly escape names with quotes
+      result,
+      sgpa,
+      totalCredits.toString(),
+      ...subjectGrades
+    ].join(",");
+  });
+  
+  const csvContent = [headers.join(","), ...rows].join("\n");
+  
+  // Add BOM for Excel UTF-8 compatibility
+  const BOM = "\uFEFF";
+  const blob = new Blob([BOM + csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(link.href);
+};
+
+// ─── PDF Print Function ──────────────────────────────────────────────────────
+const handlePrintPDF = () => {
+  // Small delay to ensure print styles take effect
+  setTimeout(() => {
+    window.print();
+  }, 100);
+};
 
 
 // ─── Nav Item (matches original) ─────────────────────────────────────────────
@@ -74,7 +125,7 @@ const OsmaniaDashboard = () => {
 
   return (
     <div className="flex h-screen bg-[#0a0a0a] text-white overflow-hidden">
-      {/* Scrollbar Styles */}
+      {/* Scrollbar & Print Styles */}
       <style jsx global>{`
         .sidebar-scroll::-webkit-scrollbar { width: 4px; }
         .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
@@ -85,7 +136,122 @@ const OsmaniaDashboard = () => {
         .main-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
         .main-scroll { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.15) transparent; }
         select option { background: #161616; color: white; }
+        
+        @media print {
+          * { 
+            -webkit-print-color-adjust: exact !important; 
+            print-color-adjust: exact !important; 
+            color-adjust: exact !important;
+          }
+          
+          html, body { 
+            height: auto !important;
+            overflow: visible !important;
+            background: #fff !important;
+          }
+          
+          /* Hide non-essential */
+          aside, .lg\\:hidden, button, .mobile-header { 
+            display: none !important; 
+          }
+          
+          /* Main container */
+          .flex.h-screen {
+            display: block !important;
+            height: auto !important;
+            overflow: visible !important;
+          }
+          
+          main, .main-scroll, .flex-1 {
+            overflow: visible !important;
+            height: auto !important;
+            max-height: none !important;
+            position: static !important;
+          }
+          
+          .main-scroll {
+            border: none !important;
+            border-radius: 0 !important;
+          }
+          
+          /* Convert dark to light theme */
+          .bg-\\[\\#0a0a0a\\], .bg-\\[\\#111111\\], .bg-\\[\\#161616\\], .bg-\\[\\#1a1a1a\\], .bg-\\[\\#1f1f1f\\], .bg-\\[\\#1c2333\\] {
+            background: #ffffff !important;
+            border: 1px solid #e5e7eb !important;
+          }
+          
+          /* Text colors for print */
+          .text-white { color: #111827 !important; }
+          .text-\\[\\#8b8b8b\\], .text-\\[\\#6b6b6b\\], .text-\\[\\#4b4b4b\\], .text-\\[\\#3a3a3a\\] { color: #6b7280 !important; }
+          
+          /* Colored text - keep but ensure visible */
+          .text-cyan-400, .text-cyan-300, .text-cyan-200 { color: #0891b2 !important; }
+          .text-emerald-400, .text-emerald-300 { color: #059669 !important; }
+          .text-amber-400, .text-amber-300 { color: #d97706 !important; }
+          .text-rose-400, .text-rose-300 { color: #e11d48 !important; }
+          .text-purple-400 { color: #9333ea !important; }
+          .text-blue-400 { color: #2563eb !important; }
+          
+          /* Keep gradient backgrounds as solid colors */
+          [class*="bg-gradient-to"] {
+            background: #f3f4f6 !important;
+          }
+          
+          /* Tables */
+          table { page-break-inside: auto; }
+          tr { page-break-inside: avoid; page-break-after: auto; }
+          thead { display: table-header-group; }
+          
+          /* Cards don't break */
+          .rounded-xl, .rounded-2xl {
+            page-break-inside: avoid;
+            margin-bottom: 8px !important;
+          }
+          
+          /* Borders visible */
+          .border, [class*="border-"] {
+            border-color: #e5e7eb !important;
+          }
+          
+          /* SVG Charts */
+          svg { max-width: 100%; height: auto; }
+          svg text { fill: #374151 !important; }
+          svg circle, svg rect, svg path { 
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          
+          /* Page setup */
+          @page { 
+            margin: 0.75cm; 
+            size: A4 portrait; 
+          }
+          
+          /* Print header */
+          .print-header {
+            display: block !important;
+            text-align: center;
+            padding: 16px 0;
+            border-bottom: 2px solid #0891b2;
+            margin-bottom: 20px;
+          }
+          
+          /* Footer hide */
+          .mt-12.pt-6 { display: none !important; }
+        }
+        
+        .print-header { display: none; }
       `}</style>
+
+      {/* Print Header - Only shows when printing */}
+      <div className="print-header">
+        <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', margin: 0 }}>
+          Osmania University Results Analytics
+        </h1>
+        <p style={{ fontSize: '14px', color: '#6b7280', margin: '4px 0 0 0' }}>
+          {selectedYear} · Semester {selectedSemester} · {tabs.find(t => t.key === activeTab)?.label}
+        </p>
+      </div>
 
       {/* ── Sidebar ─────────────────────────────────────────────────────────── */}
       <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-[280px] bg-[#0a0a0a] 
@@ -205,38 +371,46 @@ const OsmaniaDashboard = () => {
           </div>
 
           {/* Content */}
-          <div className="p-6 lg:p-8">
+          <div className="p-4 sm:p-6 lg:p-8">
             <div className="max-w-5xl mx-auto">
 
-              {/* Breadcrumb */}
-              <div className="flex items-center gap-2 text-sm text-[#6b6b6b] mb-6">
-                <span>Osmania University</span>
-                <ChevronRight size={14} />
-                <span>Results Analytics</span>
-                <ChevronRight size={14} />
-                <span className="text-white capitalize">
+              {/* Breadcrumb - Hidden on small mobile, shown from sm: */}
+              <div className="hidden sm:flex items-center gap-2 text-sm text-[#6b6b6b] mb-6 overflow-x-auto">
+                <span className="whitespace-nowrap">Osmania University</span>
+                <ChevronRight size={14} className="flex-shrink-0" />
+                <span className="whitespace-nowrap">Results Analytics</span>
+                <ChevronRight size={14} className="flex-shrink-0" />
+                <span className="text-white capitalize whitespace-nowrap">
                   {tabs.find(t => t.key === activeTab)?.label}
                 </span>
               </div>
 
               {/* Page Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
                 <div>
-                  <h1 className="text-2xl font-bold text-white">
+                  <h1 className="text-xl sm:text-2xl font-bold text-white">
                     {tabs.find(t => t.key === activeTab)?.label}
                   </h1>
-                  <p className="text-[#6b6b6b] text-sm mt-1">
+                  <p className="text-[#6b6b6b] text-xs sm:text-sm mt-1">
                     {selectedYear} · Osmania University
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="flex items-center gap-2 px-3 py-2 bg-[#161616] border border-[#222222] rounded-lg text-[#8b8b8b] hover:text-white hover:border-[#333] text-sm transition-colors">
-                    <Filter size={14} />
-                    <span>Filter</span>
+                  <button 
+                    onClick={() => exportToCSV(students, `OU_Results_Sem${selectedSemester}_${selectedYear}_${activeTab}.csv`, selectedSemester)}
+                    disabled={isLoading || students.length === 0}
+                    className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-2 bg-[#161616] border border-[#222222] rounded-lg text-[#8b8b8b] hover:text-white hover:border-[#333] text-xs sm:text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <FileDown size={14} />
+                    <span className="hidden xs:inline">CSV</span>
                   </button>
-                  <button className="flex items-center gap-2 px-3 py-2 bg-[#161616] border border-[#222222] rounded-lg text-[#8b8b8b] hover:text-white hover:border-[#333] text-sm transition-colors">
+                  <button 
+                    onClick={handlePrintPDF}
+                    disabled={isLoading}
+                    className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-2 bg-[#161616] border border-[#222222] rounded-lg text-[#8b8b8b] hover:text-white hover:border-[#333] text-xs sm:text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
                     <Download size={14} />
-                    <span>Export</span>
+                    <span className="hidden xs:inline">PDF</span>
                   </button>
                 </div>
               </div>
