@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   BarChart3, BookOpen, Users, TrendingUp, ArrowRight,
   GraduationCap, CheckCircle2, Award, ChevronRight, ExternalLink,
-  Code, Database, Cpu, AlertCircle,
+  Cpu,
 } from "lucide-react";
 
 // ── Animated Counter ──────────────────────────────────────────────────────────

@@ -11,18 +11,11 @@ import {
   BookOpen,
   Users,
   TrendingUp,
-  TrendingDown,
   ChevronRight,
   Menu,
   X,
-  Award,
-  AlertCircle,
-  CheckCircle2,
-  Clock,
   Filter,
   Download,
-  Search,
-  Minus,
 } from "lucide-react";
 
 // ─── Brand Logo ──────────────────────────────────────────────────────────────
@@ -36,40 +29,6 @@ const OULogo = () => (
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Tab = "overview" | "classwise" | "subjectwise" | "passpercent";
-
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-
-const subjectData = [
-  { subject: "Data Structures & Algorithms", code: "CS301", appeared: 4210, passed: 3494, passPercent: 83.0, avg: 71, difficulty: "Medium" },
-  { subject: "Engineering Mathematics III", code: "MA301", appeared: 8640, passed: 6048, passPercent: 70.0, avg: 58, difficulty: "Hard" },
-  { subject: "Digital Electronics", code: "EC201", appeared: 3610, passed: 2960, passPercent: 82.0, avg: 67, difficulty: "Medium" },
-  { subject: "Thermodynamics", code: "ME301", appeared: 3890, passed: 2490, passPercent: 64.0, avg: 52, difficulty: "Hard" },
-  { subject: "Fluid Mechanics", code: "CE401", appeared: 2740, passed: 1644, passPercent: 60.0, avg: 48, difficulty: "Hard" },
-  { subject: "Linear Algebra", code: "MA201", appeared: 6400, passed: 5248, passPercent: 82.0, avg: 69, difficulty: "Medium" },
-  { subject: "Computer Networks", code: "CS401", appeared: 4180, passed: 3636, passPercent: 87.0, avg: 74, difficulty: "Easy" },
-  { subject: "Organic Chemistry", code: "CH201", appeared: 3040, passed: 2067, passPercent: 68.0, avg: 55, difficulty: "Hard" },
-  { subject: "Financial Accounting", code: "BC101", appeared: 3200, passed: 2688, passPercent: 84.0, avg: 70, difficulty: "Easy" },
-  { subject: "Electromagnetic Theory", code: "EC301", appeared: 3610, passed: 2202, passPercent: 61.0, avg: 49, difficulty: "Hard" },
-];
-
-const passPercentTrend = [
-  { sem: "Sem 1", "2023–24": 74, "2022–23": 70, "2021–22": 68 },
-  { sem: "Sem 2", "2023–24": 71, "2022–23": 68, "2021–22": 65 },
-  { sem: "Sem 3", "2023–24": 69, "2022–23": 65, "2021–22": 63 },
-  { sem: "Sem 4", "2023–24": 73, "2022–23": 69, "2021–22": 67 },
-  { sem: "Sem 5", "2023–24": 76, "2022–23": 72, "2021–22": 70 },
-  { sem: "Sem 6", "2023–24": 71, "2022–23": 67, "2021–22": 65 },
-];
-
-const gradeDistribution = [
-  { grade: "O (90–100)", count: 1240, pct: 5.1, color: "#06b6d4" },
-  { grade: "A+ (80–89)", count: 2001, pct: 8.3, color: "#10b981" },
-  { grade: "A (70–79)", count: 4362, pct: 18.0, color: "#84cc16" },
-  { grade: "B+ (60–69)", count: 5814, pct: 24.0, color: "#f59e0b" },
-  { grade: "B (50–59)", count: 3840, pct: 15.9, color: "#f97316" },
-  { grade: "C (40–49)", count: 1031, pct: 4.3, color: "#ef4444" },
-  { grade: "F (<40)", count: 5892, pct: 24.4, color: "#6b7280" },
-];
 
 
 // ─── Nav Item (matches original) ─────────────────────────────────────────────
@@ -88,20 +47,16 @@ const NavItem = ({
 const OsmaniaDashboard = () => {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   
   // Use the OU Results hook for live data
   const {
     students,
     semesterAnalytics,
     selectedSemester,
-    setSelectedSemester,
-    availableSemesters,
     isLoading,
     loadingProgress,
     error,
     refetch,
-    clearCache,
   } = useOUResults();
   
   // Computed values
@@ -116,11 +71,6 @@ const OsmaniaDashboard = () => {
     { key: "subjectwise", label: "Subject Wise", icon: BookOpen },
     { key: "passpercent", label: "Pass Percent", icon: TrendingUp },
   ];
-
-  const filteredSubjects = subjectData.filter(s =>
-    s.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    s.code.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
     <div className="flex h-screen bg-[#0a0a0a] text-white overflow-hidden">
@@ -313,8 +263,27 @@ const OsmaniaDashboard = () => {
                   onRefresh={refetch}
                 />
               )}
-              {activeTab === "subjectwise" && <SubjectwiseTab searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}
-              {activeTab === "passpercent" && <PasspercentTab />}
+              {activeTab === "subjectwise" && (
+                <SubjectwiseTab
+                  subjects={semesterAnalytics?.subjects || []}
+                  gradeBreakdown={semesterAnalytics?.subjectGradeBreakdown || []}
+                  isLoading={isLoading}
+                  loadingProgress={loadingProgress}
+                  error={error}
+                  onRefresh={refetch}
+                />
+              )}
+              {activeTab === "passpercent" && (
+                <PasspercentTab
+                  students={students}
+                  subjects={semesterAnalytics?.subjects || []}
+                  overviewStats={semesterAnalytics?.overviewStats || null}
+                  isLoading={isLoading}
+                  loadingProgress={loadingProgress}
+                  error={error}
+                  onRefresh={refetch}
+                />
+              )}
 
               {/* Footer Credits */}
               <div className="mt-12 pt-6 border-t border-[#1a1a1a] text-center">

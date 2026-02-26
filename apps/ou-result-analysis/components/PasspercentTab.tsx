@@ -1,183 +1,560 @@
-import React from "react";
-import { TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
+"use client";
+import React, { useState, useMemo } from "react";
+import { TrendingUp, TrendingDown, AlertCircle, RefreshCw, Users, CheckCircle2, AlertTriangle, XCircle, Award, BarChart3, PieChart } from "lucide-react";
+import { StudentResult, SubjectAnalytics, OverviewStats, SEMESTER_3_SUBJECTS } from "@/lib/types";
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-const passPercentTrend = [
-  { sem: "Sem 1", "2023–24": 74, "2022–23": 70, "2021–22": 68 },
-  { sem: "Sem 2", "2023–24": 71, "2022–23": 68, "2021–22": 65 },
-  { sem: "Sem 3", "2023–24": 69, "2022–23": 65, "2021–22": 63 },
-  { sem: "Sem 4", "2023–24": 73, "2022–23": 69, "2021–22": 67 },
-  { sem: "Sem 5", "2023–24": 76, "2022–23": 72, "2021–22": 70 },
-  { sem: "Sem 6", "2023–24": 71, "2022–23": 67, "2021–22": 65 },
-];
+// ─── Props ────────────────────────────────────────────────────────────────────
+interface PasspercentTabProps {
+  students: StudentResult[];
+  subjects: SubjectAnalytics[];
+  overviewStats: OverviewStats | null;
+  isLoading: boolean;
+  loadingProgress: { current: number; total: number };
+  error: string | null;
+  onRefresh: () => void;
+}
 
-// ─── Trend Sparkline (SVG) ────────────────────────────────────────────────────
-const Sparkline = ({ data, color = "#06b6d4" }: { data: number[]; color?: string }) => {
-  const w = 80, h = 28;
-  const min = Math.min(...data), max = Math.max(...data);
-  const pts = data.map((v, i) => {
-    const x = (i / (data.length - 1)) * w;
-    const y = h - ((v - min) / (max - min + 1)) * h;
-    return `${x},${y}`;
-  }).join(" ");
+// ─── Divisions ────────────────────────────────────────────────────────────────
+const DIVISIONS = ["A", "B", "C", "D", "E", "F", "G", "H"] as const;
+type Division = typeof DIVISIONS[number];
+
+const getDivisionFromRoll = (rollnumber: string): Division | null => {
+  const last3 = parseInt(rollnumber.slice(-3), 10);
+  if (isNaN(last3) || last3 < 1) return null;
+  const divIndex = Math.floor((last3 - 1) / 60);
+  return divIndex >= 0 && divIndex < 8 ? DIVISIONS[divIndex] : null;
+};
+
+// ─── Grade Colors ─────────────────────────────────────────────────────────────
+const RESULT_COLORS = {
+  passed: "#10b981",
+  promoted: "#f59e0b",
+  failed: "#ef4444",
+};
+
+// ─── Loading State ────────────────────────────────────────────────────────────
+const LoadingState = ({ progress }: { progress: { current: number; total: number } }) => (
+  <div className="flex flex-col items-center justify-center py-20 space-y-4">
+    <RefreshCw size={28} className="text-cyan-400 animate-spin" />
+    <p className="text-[#6b6b6b] text-sm">Loading pass analysis...</p>
+    {progress.total > 0 && (
+      <div className="w-48">  
+        <div className="h-1.5 bg-[#1f1f1f] rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-cyan-500 rounded-full transition-all duration-300"
+            style={{ width: `${(progress.current / progress.total) * 100}%` }}
+          />
+        </div>
+        <p className="text-[#4b4b4b] text-xs mt-2 text-center">{progress.current} / {progress.total}</p>
+      </div>
+    )}
+  </div>
+);
+
+// ─── Error State ──────────────────────────────────────────────────────────────
+const ErrorState = ({ error, onRetry }: { error: string; onRetry: () => void }) => (
+  <div className="flex flex-col items-center justify-center py-20 space-y-4">
+    <div className="w-14 h-14 rounded-full bg-rose-500/10 flex items-center justify-center">
+      <AlertCircle size={24} className="text-rose-400" />
+    </div>
+    <p className="text-rose-400 text-sm text-center max-w-md">{error}</p>
+    <button
+      onClick={onRetry}
+      className="flex items-center gap-2 px-4 py-2 bg-[#1c2333] text-cyan-400 rounded-lg text-sm hover:bg-[#243044] transition-colors"
+    >
+      <RefreshCw size={14} /> Retry
+    </button>
+  </div>
+);
+
+// ─── Donut Chart ──────────────────────────────────────────────────────────────
+const DonutChart = ({ passed, promoted, failed }: { passed: number; promoted: number; failed: number }) => {
+  const total = passed + promoted + failed || 1;
+  const passedPct = (passed / total) * 100;
+  const promotedPct = (promoted / total) * 100;
+  const failedPct = (failed / total) * 100;
+  
+  const size = 160, stroke = 20, radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const passedOffset = 0;
+  const promotedOffset = (passedPct / 100) * circumference;
+  const failedOffset = ((passedPct + promotedPct) / 100) * circumference;
+  
   return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
-      <polyline points={pts} fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <div className="relative">
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="transform -rotate-90">
+        {/* Passed */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke={RESULT_COLORS.passed}
+          strokeWidth={stroke}
+          strokeDasharray={`${(passedPct / 100) * circumference} ${circumference}`}
+          strokeDashoffset={0}
+        />
+        {/* Promoted */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke={RESULT_COLORS.promoted}
+          strokeWidth={stroke}
+          strokeDasharray={`${(promotedPct / 100) * circumference} ${circumference}`}
+          strokeDashoffset={-promotedOffset}
+        />
+        {/* Failed */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke={RESULT_COLORS.failed}
+          strokeWidth={stroke}
+          strokeDasharray={`${(failedPct / 100) * circumference} ${circumference}`}
+          strokeDashoffset={-failedOffset}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <p className="text-2xl font-bold text-white">{total}</p>
+        <p className="text-[10px] text-[#6b6b6b]">Students</p>
+      </div>
+    </div>
   );
 };
 
-// ─── Line Chart (SVG) ─────────────────────────────────────────────────────────
-const TrendChart = () => {
-  const years = ["2023–24", "2022–23", "2021–22"] as const;
-  const colors = ["#06b6d4", "#10b981", "#f59e0b"];
-  const w = 500, h = 120, padL = 32, padR = 16, padT = 10, padB = 24;
-  const iw = w - padL - padR, ih = h - padT - padB;
-  const sems = passPercentTrend.length;
-  const yMin = 58, yMax = 80;
-
-  const toX = (i: number) => padL + (i / (sems - 1)) * iw;
-  const toY = (v: number) => padT + ih - ((v - yMin) / (yMax - yMin)) * ih;
-
+// ─── Bar Chart for Division ───────────────────────────────────────────────────
+const DivisionBarChart = ({ divisionStats }: { divisionStats: { div: string; passed: number; promoted: number; failed: number; total: number }[] }) => {
+  const maxTotal = Math.max(...divisionStats.map(d => d.total), 1);
+  
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-32">
-      {/* Grid lines */}
-      {[60, 65, 70, 75, 80].map(v => (
-        <line key={v} x1={padL} y1={toY(v)} x2={w - padR} y2={toY(v)}
-          stroke="#1f1f1f" strokeWidth="1" />
-      ))}
-      {[60, 65, 70, 75, 80].map(v => (
-        <text key={v} x={padL - 4} y={toY(v) + 4} textAnchor="end"
-          fontSize="9" fill="#4b5563">{v}%</text>
-      ))}
-      {/* Lines */}
-      {years.map((yr, yi) => {
-        const pts = passPercentTrend.map((d, i) => `${toX(i)},${toY(d[yr])}`).join(" ");
-        return <polyline key={yr} points={pts} fill="none" stroke={colors[yi]}
-          strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />;
+    <div className="space-y-3">
+      {divisionStats.map(d => {
+        const passRate = d.total > 0 ? ((d.passed / d.total) * 100).toFixed(1) : "0.0";
+        return (
+          <div key={d.div} className="group">
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-2">
+                <span className="w-8 h-8 rounded-lg bg-[#1c2333] flex items-center justify-center text-cyan-400 font-bold text-sm">{d.div}</span>
+                <span className="text-xs text-[#8b8b8b]">{d.total} students</span>
+              </div>
+              <span className={`text-xs font-bold ${parseFloat(passRate) >= 50 ? "text-emerald-400" : "text-rose-400"}`}>
+                {passRate}% clear
+              </span>
+            </div>
+            <div className="h-3 bg-[#1f1f1f] rounded-full overflow-hidden flex">
+              <div 
+                className="h-full transition-all duration-500"
+                style={{ width: `${(d.passed / maxTotal) * 100}%`, background: RESULT_COLORS.passed }}
+                title={`Passed: ${d.passed}`}
+              />
+              <div 
+                className="h-full transition-all duration-500"
+                style={{ width: `${(d.promoted / maxTotal) * 100}%`, background: RESULT_COLORS.promoted }}
+                title={`Promoted: ${d.promoted}`}
+              />
+              <div 
+                className="h-full transition-all duration-500"
+                style={{ width: `${(d.failed / maxTotal) * 100}%`, background: RESULT_COLORS.failed }}
+                title={`Failed: ${d.failed}`}
+              />
+            </div>
+          </div>
+        );
       })}
-      {/* Dots */}
-      {years.map((yr, yi) =>
-        passPercentTrend.map((d, i) => (
-          <circle key={`${yr}-${i}`} cx={toX(i)} cy={toY(d[yr])} r="3"
-            fill="#111111" stroke={colors[yi]} strokeWidth="1.5" />
-        ))
-      )}
-      {/* X labels */}
-      {passPercentTrend.map((d, i) => (
-        <text key={i} x={toX(i)} y={h - 4} textAnchor="middle"
-          fontSize="9" fill="#6b7280">{d.sem}</text>
-      ))}
-    </svg>
+    </div>
+  );
+};
+
+// ─── Subject Pass Rate Bars ───────────────────────────────────────────────────
+const SubjectPassBars = ({ subjects }: { subjects: SubjectAnalytics[] }) => {
+  const sorted = [...subjects].sort((a, b) => b.passPercentage - a.passPercentage);
+  
+  return (
+    <div className="space-y-2">
+      {sorted.map(sub => {
+        const color = sub.passPercentage >= 80 ? "#10b981" : sub.passPercentage >= 70 ? "#f59e0b" : "#ef4444";
+        const isLab = sub.name.toLowerCase().includes("lab");
+        return (
+          <div key={sub.code} className="group">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <span className="text-[9px] font-mono text-cyan-400 bg-[#1c2333] px-1.5 py-0.5 rounded flex-shrink-0">{sub.code}</span>
+                <span className="text-[11px] text-white truncate">{sub.name}</span>
+                {isLab && <span className="text-[8px] px-1 py-0.5 rounded bg-amber-500/20 text-amber-400 flex-shrink-0">LAB</span>}
+              </div>
+              <span className="text-[11px] font-bold ml-2 flex-shrink-0" style={{ color }}>{sub.passPercentage.toFixed(1)}%</span>
+            </div>
+            <div className="h-1.5 bg-[#1f1f1f] rounded-full overflow-hidden">
+              <div 
+                className="h-full rounded-full transition-all duration-700"
+                style={{ width: `${sub.passPercentage}%`, background: color }}
+              />
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 };
 
 // ─── Pass Percent Tab ──────────────────────────────────────────────────────────
-const PasspercentTab = () => {
+const PasspercentTab = ({
+  students,
+  subjects,
+  // overviewStats can be used for additional analytics if needed
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  overviewStats,
+  isLoading,
+  loadingProgress,
+  error,
+  onRefresh,
+}: PasspercentTabProps) => {
+  const [selectedDivision, setSelectedDivision] = useState<Division | "all">("all");
+  
+  // ─── Compute Division Stats ────────────────────────────────────────────────
+  const divisionStats = useMemo(() => {
+    const stats: Record<Division, { passed: number; promoted: number; failed: number; total: number }> = {
+      A: { passed: 0, promoted: 0, failed: 0, total: 0 },
+      B: { passed: 0, promoted: 0, failed: 0, total: 0 },
+      C: { passed: 0, promoted: 0, failed: 0, total: 0 },
+      D: { passed: 0, promoted: 0, failed: 0, total: 0 },
+      E: { passed: 0, promoted: 0, failed: 0, total: 0 },
+      F: { passed: 0, promoted: 0, failed: 0, total: 0 },
+      G: { passed: 0, promoted: 0, failed: 0, total: 0 },
+      H: { passed: 0, promoted: 0, failed: 0, total: 0 },
+    };
+    
+    const sem3Codes = Object.keys(SEMESTER_3_SUBJECTS);
+    
+    for (const student of students) {
+      const div = getDivisionFromRoll(student.rollnumber);
+      if (!div) continue;
+      
+      stats[div].total++;
+      
+      // Get Sem 3 result
+      const sem3 = student.semesterResults.find(s => s.semester === 3);
+      if (!sem3) {
+        stats[div].failed++;
+        continue;
+      }
+      
+      // Check for F grades in Sem 3 subjects
+      const sem3Subjects = student.subjects.filter(s => sem3Codes.includes(s.code));
+      const hasF = sem3Subjects.some(s => s.grade === "F");
+      
+      if (sem3.result.includes("PASSED") && !hasF) {
+        stats[div].passed++;
+      } else if (sem3.result.includes("PROMOTED") || (sem3.result.includes("PASSED") && hasF)) {
+        stats[div].promoted++;
+      } else {
+        stats[div].failed++;
+      }
+    }
+    
+    return DIVISIONS.map(d => ({ div: d, ...stats[d] }));
+  }, [students]);
+  
+  // ─── Overall Stats for Selected Division ───────────────────────────────────
+  const selectedStats = useMemo(() => {
+    if (selectedDivision === "all") {
+      const totalPassed = divisionStats.reduce((a, d) => a + d.passed, 0);
+      const totalPromoted = divisionStats.reduce((a, d) => a + d.promoted, 0);
+      const totalFailed = divisionStats.reduce((a, d) => a + d.failed, 0);
+      return { passed: totalPassed, promoted: totalPromoted, failed: totalFailed, total: students.length };
+    }
+    const div = divisionStats.find(d => d.div === selectedDivision);
+    return div ? { ...div } : { passed: 0, promoted: 0, failed: 0, total: 0 };
+  }, [selectedDivision, divisionStats, students.length]);
+  
+  // ─── Best/Worst Division ───────────────────────────────────────────────────
+  const { bestDiv, worstDiv } = useMemo(() => {
+    const sorted = divisionStats
+      .filter(d => d.total > 0)
+      .map(d => ({ ...d, passRate: (d.passed / d.total) * 100 }))
+      .sort((a, b) => b.passRate - a.passRate);
+    return {
+      bestDiv: sorted[0] || null,
+      worstDiv: sorted[sorted.length - 1] || null,
+    };
+  }, [divisionStats]);
+  
+  // ─── Subject Stats ─────────────────────────────────────────────────────────
+  const subjectStats = useMemo(() => {
+    const sorted = [...subjects].sort((a, b) => b.passPercentage - a.passPercentage);
+    return {
+      highestPass: sorted[0] || null,
+      lowestPass: sorted[sorted.length - 1] || null,
+      avgPassRate: subjects.reduce((a, s) => a + s.passPercentage, 0) / (subjects.length || 1),
+    };
+  }, [subjects]);
+  
+  // ─── Loading & Error States ────────────────────────────────────────────────
+  if (isLoading) return <LoadingState progress={loadingProgress} />;
+  if (error) return <ErrorState error={error} onRetry={onRefresh} />;
+
   return (
     <div className="space-y-6">
-      {/* Year comparison cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[
-          { year: "2023–24", avg: 72.3, prev: 69.5, sparkData: [70, 68, 66, 71, 75, 74], color: "#06b6d4" },
-          { year: "2022–23", avg: 69.5, prev: 67.2, sparkData: [67, 65, 63, 68, 71, 72], color: "#10b981" },
-          { year: "2021–22", avg: 67.2, prev: 65.0, sparkData: [65, 63, 61, 66, 69, 67], color: "#f59e0b" },
-        ].map(card => {
-          const diff = (card.avg - card.prev).toFixed(1);
-          const up = card.avg > card.prev;
-          return (
-            <div key={card.year} className="bg-[#161616] border border-[#222222] rounded-xl p-5">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[#6b6b6b] text-sm">{card.year}</span>
-                <Sparkline data={card.sparkData} color={card.color} />
-              </div>
-              <p className="text-3xl font-bold text-white">{card.avg}%</p>
-              <div className={`flex items-center gap-1 mt-1 text-xs font-medium ${up ? "text-emerald-400" : "text-rose-400"}`}>
-                {up ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-                <span>{up ? "+" : ""}{diff}% vs prior year</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Multi-year trend chart */}
-      <div className="bg-[#161616] border border-[#222222] rounded-2xl p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-white">Semester-wise Pass % — 3 Year Trend</h2>
-          <div className="flex items-center gap-4">
-            {(["2023–24", "2022–23", "2021–22"] as const).map((yr, i) => (
-              <div key={yr} className="flex items-center gap-1.5">
-                <div className="w-3 h-0.5 rounded" style={{ background: ["#06b6d4", "#10b981", "#f59e0b"][i] }} />
-                <span className="text-[11px] text-[#6b6b6b]">{yr}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <TrendChart />
-      </div>
-
-      {/* Semester table */}
-      <div className="bg-[#161616] border border-[#222222] rounded-2xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-[#1f1f1f]">
-          <h2 className="text-base font-semibold text-white">Semester-wise Pass % Detail</h2>
-        </div>
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-[#1a1a1a]">
-              {["Semester", "2023–24", "2022–23", "2021–22", "YoY Change"].map(h => (
-                <th key={h} className="px-6 py-3 text-left text-[11px] font-semibold text-[#6b6b6b] uppercase tracking-wider">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {passPercentTrend.map((row, i) => {
-              const diff = (row["2023–24"] - row["2022–23"]).toFixed(1);
-              const up = row["2023–24"] >= row["2022–23"];
-              return (
-                <tr key={i} className="border-b border-[#1a1a1a] last:border-0 hover:bg-[#1a1a1a]/50 transition-colors">
-                  <td className="px-6 py-4 text-white text-sm font-medium">{row.sem}</td>
-                  <td className="px-6 py-4 text-cyan-400 text-sm font-bold">{row["2023–24"]}%</td>
-                  <td className="px-6 py-4 text-emerald-400 text-sm">{row["2022–23"]}%</td>
-                  <td className="px-6 py-4 text-amber-400 text-sm">{row["2021–22"]}%</td>
-                  <td className="px-6 py-4">
-                    <span className={`flex items-center gap-1 text-xs font-semibold ${up ? "text-emerald-400" : "text-rose-400"}`}>
-                      {up ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-                      {up ? "+" : ""}{diff}%
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Insight cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {[
-          {
-            icon: TrendingUp, color: "emerald",
-            title: "Consistent Improvement",
-            desc: "Overall pass percentage has grown by 5.1 percentage points over 3 years, reflecting curriculum and teaching reforms.",
-          },
-          {
-            icon: AlertCircle, color: "amber",
-            title: "Sem 3 Dip Pattern",
-            desc: "Semester 3 consistently records the lowest pass rate across all years, suggesting challenging core subjects.",
-          },
-        ].map(card => (
-          <div key={card.title} className="bg-[#161616] border border-[#222222] rounded-xl p-5 flex items-start gap-4">
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0
-              ${card.color === "emerald" ? "bg-emerald-500/20 text-emerald-400" : "bg-amber-500/20 text-amber-400"}`}>
-              <card.icon size={20} />
-            </div>
-            <div>
-              <p className="text-white font-semibold text-sm">{card.title}</p>
-              <p className="text-[#6b6b6b] text-sm mt-1">{card.desc}</p>
-            </div>
-          </div>
+      {/* Division Filter */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => setSelectedDivision("all")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            selectedDivision === "all"
+              ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30"
+              : "bg-[#161616] text-[#8b8b8b] border border-[#222222] hover:text-white"
+          }`}
+        >
+          All Divisions
+        </button>
+        {DIVISIONS.map(div => (
+          <button
+            key={div}
+            onClick={() => setSelectedDivision(div)}
+            className={`w-10 h-10 rounded-lg text-sm font-bold transition-colors ${
+              selectedDivision === div
+                ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30"
+                : "bg-[#161616] text-[#8b8b8b] border border-[#222222] hover:text-white"
+            }`}
+          >
+            {div}
+          </button>
         ))}
+      </div>
+
+      {/* Main Stats Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-[#161616] border border-[#222222] rounded-xl p-5 text-center">
+          <div className="w-12 h-12 rounded-full bg-[#1c2333] flex items-center justify-center mx-auto mb-3">
+            <Users size={20} className="text-white" />
+          </div>
+          <p className="text-3xl font-bold text-white">{selectedStats.total}</p>
+          <p className="text-[#6b6b6b] text-xs mt-1">Total Students</p>
+        </div>
+        <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-5 text-center">
+          <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-3">
+            <CheckCircle2 size={20} className="text-emerald-400" />
+          </div>
+          <p className="text-3xl font-bold text-emerald-400">{selectedStats.passed}</p>
+          <p className="text-[#6b6b6b] text-xs mt-1">Passed (Clear)</p>
+          <p className="text-emerald-400/60 text-[10px] mt-0.5">
+            {((selectedStats.passed / (selectedStats.total || 1)) * 100).toFixed(1)}%
+          </p>
+        </div>
+        <div className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border border-amber-500/20 rounded-xl p-5 text-center">
+          <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center mx-auto mb-3">
+            <AlertTriangle size={20} className="text-amber-400" />
+          </div>
+          <p className="text-3xl font-bold text-amber-400">{selectedStats.promoted}</p>
+          <p className="text-[#6b6b6b] text-xs mt-1">Promoted (Backlogs)</p>
+          <p className="text-amber-400/60 text-[10px] mt-0.5">
+            {((selectedStats.promoted / (selectedStats.total || 1)) * 100).toFixed(1)}%
+          </p>
+        </div>
+        <div className="bg-gradient-to-br from-rose-500/10 to-rose-500/5 border border-rose-500/20 rounded-xl p-5 text-center">
+          <div className="w-12 h-12 rounded-full bg-rose-500/20 flex items-center justify-center mx-auto mb-3">
+            <XCircle size={20} className="text-rose-400" />
+          </div>
+          <p className="text-3xl font-bold text-rose-400">{selectedStats.failed}</p>
+          <p className="text-[#6b6b6b] text-xs mt-1">Failed</p>
+          <p className="text-rose-400/60 text-[10px] mt-0.5">
+            {((selectedStats.failed / (selectedStats.total || 1)) * 100).toFixed(1)}%
+          </p>
+        </div>
+      </div>
+
+      {/* Donut Chart + Legend */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-[#161616] border border-[#222222] rounded-2xl p-6">
+          <h2 className="text-base font-semibold text-white flex items-center gap-2 mb-6">
+            <PieChart size={16} className="text-cyan-400" />
+            Result Distribution
+          </h2>
+          <div className="flex flex-col sm:flex-row items-center gap-8">
+            <DonutChart 
+              passed={selectedStats.passed} 
+              promoted={selectedStats.promoted} 
+              failed={selectedStats.failed} 
+            />
+            <div className="space-y-4 flex-1">
+              <div className="flex items-center gap-3">
+                <div className="w-4 h-4 rounded" style={{ background: RESULT_COLORS.passed }} />
+                <div className="flex-1">
+                  <p className="text-white text-sm font-medium">Passed (No Backlogs)</p>
+                  <p className="text-[#6b6b6b] text-xs">Cleared all Sem 3 subjects</p>
+                </div>
+                <span className="text-emerald-400 font-bold">{selectedStats.passed}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-4 h-4 rounded" style={{ background: RESULT_COLORS.promoted }} />
+                <div className="flex-1">
+                  <p className="text-white text-sm font-medium">Promoted (With Backlogs)</p>
+                  <p className="text-[#6b6b6b] text-xs">Moved to next sem with F grades</p>
+                </div>
+                <span className="text-amber-400 font-bold">{selectedStats.promoted}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-4 h-4 rounded" style={{ background: RESULT_COLORS.failed }} />
+                <div className="flex-1">
+                  <p className="text-white text-sm font-medium">Failed</p>
+                  <p className="text-[#6b6b6b] text-xs">Did not clear semester</p>
+                </div>
+                <span className="text-rose-400 font-bold">{selectedStats.failed}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Best/Worst Division Cards */}
+        <div className="space-y-4">
+          {bestDiv && (
+            <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-5">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                  <Award size={24} className="text-emerald-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-[#8b8b8b] text-xs">Best Performing Division</p>
+                  <p className="text-white font-semibold text-lg">Division {bestDiv.div}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-emerald-400 text-2xl font-bold">{bestDiv.passRate.toFixed(1)}%</p>
+                  <p className="text-[#6b6b6b] text-xs">clear pass rate</p>
+                </div>
+              </div>
+              <div className="mt-4 grid grid-cols-3 gap-3 text-center">
+                <div className="bg-[#0a0a0a]/50 rounded-lg p-2">
+                  <p className="text-emerald-400 font-bold">{bestDiv.passed}</p>
+                  <p className="text-[10px] text-[#6b6b6b]">Passed</p>
+                </div>
+                <div className="bg-[#0a0a0a]/50 rounded-lg p-2">
+                  <p className="text-amber-400 font-bold">{bestDiv.promoted}</p>
+                  <p className="text-[10px] text-[#6b6b6b]">Promoted</p>
+                </div>
+                <div className="bg-[#0a0a0a]/50 rounded-lg p-2">
+                  <p className="text-[#8b8b8b] font-bold">{bestDiv.total}</p>
+                  <p className="text-[10px] text-[#6b6b6b]">Total</p>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {worstDiv && worstDiv.div !== bestDiv?.div && (
+            <div className="bg-gradient-to-br from-rose-500/10 to-rose-500/5 border border-rose-500/20 rounded-xl p-5">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-xl bg-rose-500/20 flex items-center justify-center">
+                  <AlertCircle size={24} className="text-rose-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-[#8b8b8b] text-xs">Needs Improvement</p>
+                  <p className="text-white font-semibold text-lg">Division {worstDiv.div}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-rose-400 text-2xl font-bold">{worstDiv.passRate.toFixed(1)}%</p>
+                  <p className="text-[#6b6b6b] text-xs">clear pass rate</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Division-wise Breakdown */}
+      <div className="bg-[#161616] border border-[#222222] rounded-2xl p-6">
+        <h2 className="text-base font-semibold text-white flex items-center gap-2 mb-2">
+          <BarChart3 size={16} className="text-cyan-400" />
+          Division-wise Breakdown
+        </h2>
+        <p className="text-[#6b6b6b] text-xs mb-6">Pass vs Promoted vs Failed for each division</p>
+        
+        {/* Legend */}
+        <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded" style={{ background: RESULT_COLORS.passed }} />
+            <span className="text-xs text-[#8b8b8b]">Passed</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded" style={{ background: RESULT_COLORS.promoted }} />
+            <span className="text-xs text-[#8b8b8b]">Promoted</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded" style={{ background: RESULT_COLORS.failed }} />
+            <span className="text-xs text-[#8b8b8b]">Failed</span>
+          </div>
+        </div>
+        
+        <DivisionBarChart divisionStats={divisionStats} />
+      </div>
+
+      {/* Subject Pass Rate */}
+      <div className="bg-[#161616] border border-[#222222] rounded-2xl p-6">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-base font-semibold text-white flex items-center gap-2">
+            <TrendingUp size={16} className="text-cyan-400" />
+            Subject-wise Pass Rates
+          </h2>
+          <span className="text-xs text-[#6b6b6b]">Avg: {subjectStats.avgPassRate.toFixed(1)}%</span>
+        </div>
+        <p className="text-[#6b6b6b] text-xs mb-6">Semester 3 subjects ranked by pass percentage</p>
+        
+        {/* Top/Bottom Subject */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          {subjectStats.highestPass && (
+            <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
+              <TrendingUp size={16} className="text-emerald-400" />
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] text-emerald-400/60">Highest Pass Rate</p>
+                <p className="text-white text-sm font-medium truncate">{subjectStats.highestPass.name}</p>
+              </div>
+              <span className="text-emerald-400 font-bold">{subjectStats.highestPass.passPercentage.toFixed(1)}%</span>
+            </div>
+          )}
+          {subjectStats.lowestPass && (
+            <div className="flex items-center gap-3 bg-rose-500/10 border border-rose-500/20 rounded-lg p-3">
+              <TrendingDown size={16} className="text-rose-400" />
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] text-rose-400/60">Lowest Pass Rate</p>
+                <p className="text-white text-sm font-medium truncate">{subjectStats.lowestPass.name}</p>
+              </div>
+              <span className="text-rose-400 font-bold">{subjectStats.lowestPass.passPercentage.toFixed(1)}%</span>
+            </div>
+          )}
+        </div>
+        
+        <SubjectPassBars subjects={subjects} />
+      </div>
+
+      {/* Insights */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="bg-[#161616] border border-[#222222] rounded-xl p-5 flex items-start gap-4">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-emerald-500/20">
+            <CheckCircle2 size={20} className="text-emerald-400" />
+          </div>
+          <div>
+            <p className="text-white font-semibold text-sm">Clear Pass Rate</p>
+            <p className="text-[#6b6b6b] text-sm mt-1">
+              {((selectedStats.passed / (selectedStats.total || 1)) * 100).toFixed(1)}% of students cleared Semester 3 
+              without any backlogs. {selectedStats.passed} out of {selectedStats.total} students.
+            </p>
+          </div>
+        </div>
+        <div className="bg-[#161616] border border-[#222222] rounded-xl p-5 flex items-start gap-4">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-amber-500/20">
+            <AlertTriangle size={20} className="text-amber-400" />
+          </div>
+          <div>
+            <p className="text-white font-semibold text-sm">Backlog Analysis</p>
+            <p className="text-[#6b6b6b] text-sm mt-1">
+              {selectedStats.promoted} students ({((selectedStats.promoted / (selectedStats.total || 1)) * 100).toFixed(1)}%) 
+              were promoted with backlogs and need to clear subjects in supplementary exams.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
