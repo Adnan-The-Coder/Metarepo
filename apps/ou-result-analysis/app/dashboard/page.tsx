@@ -92,6 +92,7 @@ const OsmaniaDashboard = () => {
   
   // Use the OU Results hook for live data
   const {
+    students,
     semesterAnalytics,
     selectedSemester,
     setSelectedSemester,
@@ -302,7 +303,16 @@ const OsmaniaDashboard = () => {
                   onRefresh={refetch}
                 />
               )}
-              {activeTab === "classwise" && <ClasswiseTab />}
+              {activeTab === "classwise" && (
+                <ClasswiseTab
+                  students={students}
+                  subjects={semesterAnalytics?.subjects || []}
+                  isLoading={isLoading}
+                  loadingProgress={loadingProgress}
+                  error={error}
+                  onRefresh={refetch}
+                />
+              )}
               {activeTab === "subjectwise" && <SubjectwiseTab searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}
               {activeTab === "passpercent" && <PasspercentTab />}
 
