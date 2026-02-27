@@ -78,7 +78,7 @@ app.use(
 
       return "";
     },
-    allowHeaders: ["Content-Type", "Authorization", "X-Access-Token"],
+    allowHeaders: ["Content-Type", "Authorization", "X-Access-Token", "expires", "Cache-Control", "Pragma"],
     allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     credentials: true,
     maxAge: 86400,
