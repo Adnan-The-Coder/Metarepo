@@ -12,7 +12,7 @@ import {
 const ouResultsRoutes = new Hono<{ Bindings: CloudflareBindings }>();
 
 // POST /ou-results - Create a new result record
-// ouResultsRoutes.post("/", createResult);
+ouResultsRoutes.post("/", createResult);
 
 // GET /ou-results - Get all results with pagination and filtering
 ouResultsRoutes.get("/", getAllResults);
