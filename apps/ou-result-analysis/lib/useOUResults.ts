@@ -5,9 +5,10 @@ import { APIResponse, APIResultEntry, StudentResult, SemesterAnalytics } from ".
 import { parseAllResults, computeSemesterAnalytics, getAvailableSemesters } from "./parseOUResults";
 
 const API_URL = "https://metarepo-cf-server.ghost-server.workers.dev/ou-results";
-const CACHE_KEY = "ou-results-cache";
-const CACHE_TIMESTAMP_KEY = "ou-results-cache-timestamp";
+// In-memory cache only (no localStorage)
 const CACHE_DURATION = 1000 * 60 * 30; // 30 minutes cache
+let memoryCache: CacheData | null = null;
+let memoryCacheTimestamp: number | null = null;
 
 interface CacheData {
   entries: APIResultEntry[];
@@ -93,26 +94,12 @@ export function useOUResults(): UseOUResultsReturn {
    * Load data from localStorage cache
    */
   const loadFromCache = useCallback((): CacheData | null => {
-    if (typeof window === "undefined") return null;
-    
-    try {
-      const cached = localStorage.getItem(CACHE_KEY);
-      const timestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
-      
-      if (cached && timestamp) {
-        const cacheTime = parseInt(timestamp, 10);
-        const now = Date.now();
-        
-        // Check if cache is still valid
-        if (now - cacheTime < CACHE_DURATION) {
-          const data = JSON.parse(cached) as CacheData;
-          return data;
-        }
+    if (memoryCache && memoryCacheTimestamp) {
+      const now = Date.now();
+      if (now - memoryCacheTimestamp < CACHE_DURATION) {
+        return memoryCache;
       }
-    } catch (err) {
-      console.error("Error loading from cache:", err);
     }
-    
     return null;
   }, []);
   
@@ -120,30 +107,21 @@ export function useOUResults(): UseOUResultsReturn {
    * Save data to localStorage cache
    */
   const saveToCache = useCallback((entries: APIResultEntry[]) => {
-    if (typeof window === "undefined") return;
-    
-    try {
-      const cacheData: CacheData = {
-        entries,
-        total: entries.length,
-        timestamp: Date.now(),
-      };
-      
-      localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-      localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
-    } catch (err) {
-      console.error("Error saving to cache:", err);
-    }
+    const cacheData: CacheData = {
+      entries,
+      total: entries.length,
+      timestamp: Date.now(),
+    };
+    memoryCache = cacheData;
+    memoryCacheTimestamp = Date.now();
   }, []);
   
   /**
    * Clear localStorage cache
    */
   const clearCache = useCallback(() => {
-    if (typeof window === "undefined") return;
-    
-    localStorage.removeItem(CACHE_KEY);
-    localStorage.removeItem(CACHE_TIMESTAMP_KEY);
+    memoryCache = null;
+    memoryCacheTimestamp = null;
   }, []);
   
   /**

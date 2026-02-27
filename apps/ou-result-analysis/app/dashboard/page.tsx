@@ -4,6 +4,7 @@ import OverviewTab from "@/components/OverviewTab";
 import ClasswiseTab from "@/components/ClasswiseTab";
 import SubjectwiseTab from "@/components/SubjectwiseTab";
 import PasspercentTab from "@/components/PasspercentTab";
+import ECEAnalysisTab from "@/components/ECE-dept-analysis";
 import { useOUResults } from "@/lib";
 import {
   GraduationCap,
@@ -28,7 +29,7 @@ const OULogo = () => (
 );
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type Tab = "overview" | "classwise" | "subjectwise" | "passpercent";
+type Tab = "overview" | "classwise" | "subjectwise" | "passpercent" | "ece";
 
 // ─── CSV Export Function ─────────────────────────────────────────────────────
 const exportToCSV = (students: { rollnumber: string; name: string; subjects: { code: string; name: string; grade: string; credits: number }[]; semesterResults: { semester: number; result: string; sgpa: number | null }[] }[], filename: string, semester = 3) => {
@@ -121,6 +122,7 @@ const OsmaniaDashboard = () => {
     { key: "classwise", label: "Class Wise", icon: Users },
     { key: "subjectwise", label: "Subject Wise", icon: BookOpen },
     { key: "passpercent", label: "Pass Percent", icon: TrendingUp },
+    { key: "ece", label: "ECE Dept", icon: GraduationCap },
   ];
 
   return (
@@ -457,6 +459,9 @@ const OsmaniaDashboard = () => {
                   error={error}
                   onRefresh={refetch}
                 />
+              )}
+              {activeTab === "ece" && (
+                <ECEAnalysisTab />
               )}
 
               {/* Footer Credits */}

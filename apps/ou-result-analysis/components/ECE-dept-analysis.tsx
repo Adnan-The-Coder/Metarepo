@@ -16,75 +16,93 @@ import {
 } from "lucide-react";
 import { StudentResult, SubjectAnalytics, SEMESTER_3_SUBJECTS } from "@/lib/types";
 
-// ─── Division Mapping ─────────────────────────────────────────────────────────
-const DIVISIONS = ["A", "B", "C", "D", "E", "F", "G", "H"] as const;
-type Division = typeof DIVISIONS[number];
+// NOTE: ECE Department data is large and can cause localStorage quota exceeded errors
+// This component uses a smart in-memory cache (not localStorage) to avoid quota issues
+// Cache is cleared when switching ECE year tabs
 
+// API base endpoint for ECE students
+const API_BASE = "https://metarepo-cf-server.ghost-server.workers.dev/ou-results/range";
 
-// Division rollnumber ranges strictly for 160424733
-const getDivisionRange = (div: Division): { start: number; end: number } => {
-  const divIndex = DIVISIONS.indexOf(div);
-  const start = 1 + divIndex * 60;
-  const end = start + 59;
-  return { start, end };
+// ECE API endpoints for different year ranges
+const ECE_API_ENDPOINTS = [
+  `${API_BASE}?rollnumber=160424735001-160424735306`, // 2nd Year (covers 001-060, 301-306)
+  `${API_BASE}?rollnumber=160423735001-160423735308`, // 3rd Year (covers 001-023, 301-308)
+  `${API_BASE}?rollnumber=160422735001-160422735314`, // 4th Year (covers all ranges)
+];
+
+// ECE Yearwise Rollnumber Groups - Exact ranges as specified by user
+const ECE_ROLL_GROUPS = {
+  "2nd Year": [
+    { prefix: "160424735", ranges: [ [1, 45], [47, 60], [301, 306] ] },
+  ],
+  "3rd Year": [
+    { prefix: "160423735", ranges: [ [1, 17], [19, 23], [301, 308] ] },
+    { prefix: "160422735", ranges: [ [5, 5] ] }, // Special case: 160422735005
+  ],
+  "4th Year": [
+    { prefix: "160422735", ranges: [ [1, 4], [6, 34], [36, 56], [58, 60], [61, 66], [68, 78], [80, 108], [301, 314] ] },
+  ],
 };
 
-// Smart in-memory cache for Classwise data (per division)
-const classwiseCache: { [div in Division]?: StudentResult[] } = {};
-
-const getStudentDivision = (rollnumber: string): Division | null => {
-  // Strictly check for 160424733 prefix and valid range
-  if (!rollnumber.startsWith("160424733")) return null;
-  const lastDigits = parseInt(rollnumber.slice(-3), 10);
-  if (isNaN(lastDigits) || lastDigits < 1 || lastDigits > 480) return null;
-  const divIndex = Math.floor((lastDigits - 1) / 60);
-  return DIVISIONS[divIndex] || null;
-};
-
-// ─── Props ────────────────────────────────────────────────────────────────────
-interface ClasswiseTabProps {
-  students: StudentResult[];
-  subjects: SubjectAnalytics[];
-  isLoading: boolean;
-  loadingProgress: { current: number; total: number };
-  error: string | null;
-  onRefresh?: () => void;
+function isECEYearRoll(roll: string, year: keyof typeof ECE_ROLL_GROUPS): boolean {
+  const groups = ECE_ROLL_GROUPS[year];
+  for (const group of groups) {
+    if (roll.startsWith(group.prefix)) {
+      const num = parseInt(roll.slice(group.prefix.length), 10);
+      for (const [start, end] of group.ranges) {
+        if (num >= start && num <= end) return true;
+      }
+    }
+  }
+  // Special case for 3rd year: 160422735005
+  if (year === "3rd Year" && roll === "160422735005") return true;
+  return false;
 }
 
+const ECE_YEARS = ["2nd Year", "3rd Year", "4th Year"] as const;
+type ECEYear = typeof ECE_YEARS[number];
+
+// Smart in-memory cache for ECE data (per year)
+const eceCache: { [year in ECEYear]?: StudentResult[] } = {};
+
 // ─── Student Row with Expandable Details ──────────────────────────────────────
-const StudentRow = ({ student, rank }: { student: StudentResult; rank: number }) => {
+const StudentRow = ({ student, rank, selectedYear }: { student: StudentResult; rank: number; selectedYear: ECEYear }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   
-  // Get Semester 3 result
-  const sem3Result = student.semesterResults.find(r => r.semester === 3);
-  const sem3SubjectCodes = Object.keys(SEMESTER_3_SUBJECTS);
+  // Semester mapping for each year
+  const semMap = { "2nd Year": 3, "3rd Year": 5, "4th Year": 7 };
+  const targetSem = semMap[selectedYear];
   
-  // Count F grades in Sem 3 subjects
-  const sem3Subjects = student.subjects.filter(s => sem3SubjectCodes.includes(s.code));
-  const fCount = sem3Subjects.filter(s => s.grade === "F").length;
+  // Get target semester result
+  const semResult = student.semesterResults.find(r => r.semester === targetSem);
+  const semSubjectCodes = Object.keys(SEMESTER_3_SUBJECTS); // TODO: Map to correct semester subjects if needed
+  
+  // Count F grades in target semester subjects
+  const semSubjects = student.subjects.filter(s => semSubjectCodes.includes(s.code));
+  const fCount = semSubjects.filter(s => s.grade === "F").length;
   
   // Determine result status and color
   let resultStatus = "N/A";
   let resultColor = "text-[#6b6b6b]";
   let cgpaDisplay = "-";
   
-  if (sem3Result) {
-    if (sem3Result.result.includes("PASSED")) {
+  if (semResult) {
+    if (semResult.result.includes("PASSED")) {
       resultStatus = "PASSED";
       resultColor = "text-emerald-400";
-    } else if (sem3Result.result.includes("ALREADY PROMOTED")) {
+    } else if (semResult.result.includes("ALREADY PROMOTED")) {
       resultStatus = "ALREADY PROMOTED";
       resultColor = "text-cyan-400";
-    } else if (sem3Result.isPromoted) {
+    } else if (semResult.isPromoted) {
       resultStatus = "PROMOTED";
       resultColor = "text-amber-400";
     }
     
-    if (sem3Result.sgpa !== null) {
-      cgpaDisplay = sem3Result.sgpa.toFixed(2);
+    if (semResult.sgpa !== null) {
+      cgpaDisplay = semResult.sgpa.toFixed(2);
     }
-    if (sem3Result.cgpa !== null) {
-      cgpaDisplay = sem3Result.cgpa.toFixed(2);
+    if (semResult.cgpa !== null) {
+      cgpaDisplay = semResult.cgpa.toFixed(2);
     }
   }
   
@@ -112,11 +130,11 @@ const StudentRow = ({ student, rank }: { student: StudentResult; rank: number })
         </td>
         <td className="px-4 py-3">
           <span className={`text-lg font-bold ${
-            sem3Result?.sgpa && sem3Result.sgpa >= 8.5 ? "text-amber-400" 
-            : sem3Result?.sgpa && sem3Result.sgpa >= 7.0 ? "text-emerald-400" 
+            semResult?.sgpa && semResult.sgpa >= 8.5 ? "text-amber-400" 
+            : semResult?.sgpa && semResult.sgpa >= 7.0 ? "text-emerald-400" 
             : "text-white"
           }`}>
-            {sem3Result?.sgpa?.toFixed(2) || "-"}
+            {semResult?.sgpa?.toFixed(2) || "-"}
           </span>
         </td>
         <td className="px-4 py-3">
@@ -149,7 +167,7 @@ const StudentRow = ({ student, rank }: { student: StudentResult; rank: number })
                     <div 
                       key={sem.semester}
                       className={`px-3 py-1.5 rounded-lg text-xs ${
-                        sem.semester === 3 ? "bg-cyan-500/20 border border-cyan-500/30" : "bg-[#1a1a1a]"
+                        sem.semester === targetSem ? "bg-cyan-500/20 border border-cyan-500/30" : "bg-[#1a1a1a]"
                       }`}
                     >
                       <span className="text-[#6b6b6b]">Sem {sem.semester}: </span>
@@ -165,13 +183,13 @@ const StudentRow = ({ student, rank }: { student: StudentResult; rank: number })
                 </div>
               </div>
               
-              {/* Semester 3 Subjects */}
+              {/* Target Semester Subjects */}
               <div>
                 <h4 className="text-xs font-semibold text-[#6b6b6b] uppercase mb-2">
-                  Semester 3 Subjects ({sem3Subjects.length})
+                  Semester {targetSem} Subjects ({semSubjects.length})
                 </h4>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-                  {sem3Subjects.map(sub => {
+                  {semSubjects.map(sub => {
                     const gradeColor = sub.grade === "S" ? "text-cyan-400"
                       : sub.grade === "A" ? "text-emerald-400"
                       : sub.grade === "B" ? "text-lime-400"
@@ -221,12 +239,18 @@ const LoadingState = ({ progress }: { progress: { current: number; total: number
       </div>
     </div>
     <div className="text-center">
-      <p className="text-white font-semibold">Loading Results Data</p>
+      <p className="text-white font-semibold">Loading ECE Results Data</p>
       <p className="text-[#6b6b6b] text-sm mt-1">
         {progress.total > 0 
-          ? `Fetched ${progress.current} of ${progress.total} records...`
-          : "Connecting to server..."
+          ? `Fetching from endpoint ${progress.current} of ${progress.total}...`
+          : "Initializing data fetch..."
         }
+      </p>
+      <p className="text-[#8b8b8b] text-xs mt-2">
+        Fetching from multiple rollnumber ranges to get all ECE students
+      </p>
+      <p className="text-[#6b6b6b] text-xs mt-1">
+        ⚠️ ECE data not cached to prevent storage quota issues
       </p>
     </div>
   </div>
@@ -237,7 +261,7 @@ const ErrorState = ({ error, onRetry }: { error: string; onRetry?: () => void })
   <div className="flex flex-col items-center justify-center py-20 space-y-4">
     <AlertCircle size={48} className="text-rose-400" />
     <div className="text-center">
-      <p className="text-white font-semibold">Failed to Load Data</p>
+      <p className="text-white font-semibold">Failed to Load ECE Data</p>
       <p className="text-[#6b6b6b] text-sm mt-1">{error}</p>
     </div>
     {onRetry && (
@@ -252,42 +276,36 @@ const ErrorState = ({ error, onRetry }: { error: string; onRetry?: () => void })
   </div>
 );
 
-// ─── Class Wise Tab ───────────────────────────────────────────────────────────
-const ClasswiseTab: React.FC<ClasswiseTabProps> = ({
-  students,
-  subjects,
-  isLoading,
-  loadingProgress,
-  error,
-  onRefresh,
-}) => {
-  const [selectedDivision, setSelectedDivision] = useState<Division>("A");
-  const [divisionStudents, setDivisionStudents] = useState<StudentResult[]>([]);
-  const [divisionLoading, setDivisionLoading] = useState(false);
-  const [divisionError, setDivisionError] = useState<string | null>(null);
-  const [divisionProgress, setDivisionProgress] = useState({ current: 0, total: 1 });
+const ECEAnalysisTab = () => {
+  const [students, setStudents] = useState<StudentResult[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [loadingProgress, setLoadingProgress] = useState({ current: 0, total: ECE_API_ENDPOINTS.length });
+  const [selectedYear, setSelectedYear] = useState<ECEYear>("2nd Year");
 
-  // Clear cache for previous division when switching tabs
+  // Clear cache for previous year when switching tabs
   useEffect(() => {
-    setDivisionStudents([]);
-    setDivisionLoading(true);
-    setDivisionError(null);
-    setDivisionProgress({ current: 0, total: 1 });
-    // If cache exists for selectedDivision, use it
-    if (classwiseCache[selectedDivision]) {
-      setDivisionStudents(classwiseCache[selectedDivision]!);
-      setDivisionLoading(false);
+    setStudents([]);
+    setIsLoading(true);
+    setError(null);
+    setLoadingProgress({ current: 0, total: 1 });
+    // If cache exists for selectedYear, use it
+    if (eceCache[selectedYear]) {
+      setStudents(eceCache[selectedYear]!);
+      setIsLoading(false);
       return;
     }
     // Otherwise, fetch and cache
-    const fetchDivisionData = async () => {
-      setDivisionLoading(true);
-      setDivisionError(null);
-      setDivisionProgress({ current: 0, total: 1 });
+    const fetchYearData = async () => {
+      setIsLoading(true);
+      setError(null);
+      setLoadingProgress({ current: 0, total: 1 });
       try {
-        // Build correct endpoint for division
-        const range = getDivisionRange(selectedDivision);
-        const endpoint = `https://metarepo-cf-server.ghost-server.workers.dev/ou-results/range?rollnumber=160424733${String(range.start).padStart(3, "0")}-160424733${String(range.end).padStart(3, "0")}`;
+        // Find correct endpoint for year
+        let endpoint = "";
+        if (selectedYear === "2nd Year") endpoint = ECE_API_ENDPOINTS[0];
+        else if (selectedYear === "3rd Year") endpoint = ECE_API_ENDPOINTS[1];
+        else if (selectedYear === "4th Year") endpoint = ECE_API_ENDPOINTS[2];
         const res = await fetch(endpoint, {
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -295,89 +313,206 @@ const ClasswiseTab: React.FC<ClasswiseTabProps> = ({
             'Expires': '0'
           }
         });
-        if (!res.ok) throw new Error("Failed to fetch division data");
+        if (!res.ok) throw new Error("Failed to fetch data");
         const data = await res.json();
-        // Strictly filter by rollnumber for division
-        const filtered = (data.students || []).filter((s: StudentResult) => getStudentDivision(s.rollnumber) === selectedDivision);
-        classwiseCache[selectedDivision] = filtered;
-        setDivisionStudents(filtered);
-        setDivisionProgress({ current: 1, total: 1 });
-        if (filtered.length === 0) setDivisionError("No students found for this division.");
+        // Filter strictly by rollnumber for selected year
+        const filtered = (data.students || []).filter((s: StudentResult) => isECEYearRoll(s.rollnumber, selectedYear));
+        eceCache[selectedYear] = filtered;
+        setStudents(filtered);
+        setLoadingProgress({ current: 1, total: 1 });
+        if (filtered.length === 0) setError("No ECE students found for this year.");
       } catch (err: any) {
-        setDivisionError(err.message || "Unknown error");
+        setError(err.message || "Unknown error");
       } finally {
-        setDivisionLoading(false);
+        setIsLoading(false);
       }
     };
-    fetchDivisionData();
-  }, [selectedDivision]);
-  
-  // Sort by SGPA (descending) for leaderboard
+    fetchYearData();
+  }, [selectedYear]);
+  useEffect(() => {
+    const fetchAllECEData = async () => {
+      setIsLoading(true);
+      setError(null);
+      setLoadingProgress({ current: 0, total: ECE_API_ENDPOINTS.length });
+      
+      // Clear any existing ECE data from localStorage to prevent quota issues
+      try {
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.includes('ou-results') || key.includes('ece-data'))) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+        console.log(`Cleared ${keysToRemove.length} cache entries to prevent quota issues`);
+      } catch (storageError) {
+        console.warn('Failed to clear localStorage cache:', storageError);
+      }
+      
+      try {
+        const allStudents: StudentResult[] = [];
+        const seenRollNumbers = new Set<string>();
+        
+        // Fetch from all ECE endpoints
+        for (let i = 0; i < ECE_API_ENDPOINTS.length; i++) {
+          const endpoint = ECE_API_ENDPOINTS[i];
+          
+          try {
+            console.log(`Fetching ECE data from: ${endpoint}`);
+            const res = await fetch(endpoint, {
+              // Disable caching to prevent localStorage quota issues
+              headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+              }
+            });
+            
+            if (!res.ok) {
+              console.warn(`Failed to fetch from ${endpoint}: ${res.status} ${res.statusText}`);
+              continue; // Skip failed endpoint but continue with others
+            }
+            
+            const data = await res.json();
+            const studentsData = data.students || [];
+            
+            console.log(`Fetched ${studentsData.length} students from endpoint ${i + 1}`);
+            
+            // Add unique students (avoid duplicates)
+            studentsData.forEach((student: StudentResult) => {
+              if (!seenRollNumbers.has(student.rollnumber)) {
+                seenRollNumbers.add(student.rollnumber);
+                allStudents.push(student);
+              }
+            });
+            
+          } catch (endpointError) {
+            console.warn(`Error fetching from ${endpoint}:`, endpointError);
+            continue; // Continue with other endpoints
+          }
+          
+          setLoadingProgress({ current: i + 1, total: ECE_API_ENDPOINTS.length });
+        }
+        
+        console.log(`Total unique ECE students fetched: ${allStudents.length}`);
+        
+        // Filter to keep only actual ECE students based on rollnumber patterns
+        const eceStudents = allStudents.filter(student => {
+          for (const year of ECE_YEARS) {
+            if (isECEYearRoll(student.rollnumber, year)) {
+              return true;
+            }
+          }
+          return false;
+        });
+        
+        console.log(`ECE students after filtering: ${eceStudents.length}`);
+        console.log('ECE students by year:', {
+          '2nd Year': eceStudents.filter(s => isECEYearRoll(s.rollnumber, '2nd Year')).length,
+          '3rd Year': eceStudents.filter(s => isECEYearRoll(s.rollnumber, '3rd Year')).length,
+          '4th Year': eceStudents.filter(s => isECEYearRoll(s.rollnumber, '4th Year')).length,
+        });
+        
+        setStudents(eceStudents);
+        
+        if (eceStudents.length === 0) {
+          setError("No ECE students found in the fetched data. Please check the API endpoints and rollnumber ranges.");
+        }
+        
+      } catch (err: any) {
+        console.error('Error fetching ECE data:', err);
+        setError(`Failed to fetch ECE data: ${err.message || "Unknown error"}`);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchAllECEData();
+  }, []);
+
+  // Students are already filtered for selected year
+  const yearStudents = students;
+
+  // Sort by SGPA (descending) for leaderboard (Semester 3 for 2nd year, Semester 5 for 3rd, Semester 7 for 4th)
+  const semMap = { "2nd Year": 3, "3rd Year": 5, "4th Year": 7 };
   const leaderboard = useMemo(() => {
-    return [...divisionStudents].sort((a, b) => {
-      const aSem3 = a.semesterResults.find(r => r.semester === 3);
-      const bSem3 = b.semesterResults.find(r => r.semester === 3);
-      const aSGPA = aSem3?.sgpa ?? -1;
-      const bSGPA = bSem3?.sgpa ?? -1;
-      return bSGPA - aSGPA; // Descending
+    return [...yearStudents].sort((a, b) => {
+      const aSem = a.semesterResults.find(r => r.semester === semMap[selectedYear]);
+      const bSem = b.semesterResults.find(r => r.semester === semMap[selectedYear]);
+      const aSGPA = aSem?.sgpa ?? -1;
+      const bSGPA = bSem?.sgpa ?? -1;
+      return bSGPA - aSGPA;
     });
-  }, [divisionStudents]);
-  
-  // Division stats
-  const divisionStats = useMemo(() => {
-    const sem3SubjectCodes = Object.keys(SEMESTER_3_SUBJECTS);
+  }, [yearStudents, selectedYear]);
+
+  // Year stats
+  const yearStats = useMemo(() => {
+    const semSubjectCodes = Object.keys(SEMESTER_3_SUBJECTS); // TODO: Map to correct semester subjects if needed
     let passed = 0;
     let promoted = 0;
     let distinctions = 0;
     let totalBacklogs = 0;
-    for (const student of divisionStudents) {
-      const sem3Result = student.semesterResults.find(r => r.semester === 3);
-      if (sem3Result) {
-        if (sem3Result.result.includes("PASSED") && !sem3Result.isPromoted) {
+    for (const student of yearStudents) {
+      const semResult = student.semesterResults.find(r => r.semester === semMap[selectedYear]);
+      if (semResult) {
+        if (semResult.result.includes("PASSED") && !semResult.isPromoted) {
           passed++;
-          if (sem3Result.sgpa && sem3Result.sgpa >= 8.5) distinctions++;
-        } else if (sem3Result.isPromoted) {
+          if (semResult.sgpa && semResult.sgpa >= 8.5) distinctions++;
+        } else if (semResult.isPromoted) {
           promoted++;
         }
       }
-      // Count F grades
+      // Count F grades (for mapped semester subjects)
       for (const sub of student.subjects) {
-        if (sem3SubjectCodes.includes(sub.code) && sub.grade === "F") {
+        if (semSubjectCodes.includes(sub.code) && sub.grade === "F") {
           totalBacklogs++;
         }
       }
     }
     return {
-      total: divisionStudents.length,
+      total: yearStudents.length,
       passed,
       promoted,
       distinctions,
       totalBacklogs,
-      passRate: divisionStudents.length > 0 ? ((passed / divisionStudents.length) * 100).toFixed(1) : "0.0",
+      passRate: yearStudents.length > 0 ? ((passed / yearStudents.length) * 100).toFixed(1) : "0.0",
     };
-  }, [divisionStudents]);
-  
-  // Show loading state
-  if (divisionLoading) {
-    return <LoadingState progress={divisionProgress} />;
-  }
-  // Show error state
-  if (divisionError) {
-    return <ErrorState error={divisionError} onRetry={() => { classwiseCache[selectedDivision] = undefined; setSelectedDivision(selectedDivision); }} />;
-  }
-  // No data available
-  if (!divisionStudents || divisionStudents.length === 0) {
+  }, [yearStudents, selectedYear]);
+
+  if (isLoading) return <LoadingState progress={loadingProgress} />;
+  if (error) return <ErrorState error={error} onRetry={() => { eceCache[selectedYear] = undefined; setSelectedYear(selectedYear); }} />;
+  if (!students || students.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20">
+      <div className="flex flex-col items-center justify-center py-20 space-y-4">
         <BookOpen size={48} className="text-[#6b6b6b]" />
-        <p className="text-[#6b6b6b] mt-4">No student data available for this division</p>
+        <div className="text-center">
+          <p className="text-white font-semibold">No ECE Students Found</p>
+          <p className="text-[#6b6b6b] text-sm mt-2">
+            No students matching ECE rollnumber patterns were found in the fetched data.
+          </p>
+          <div className="mt-4 p-4 bg-[#1a1a1a] rounded-lg border border-[#222]">
+            <p className="text-[#8b8b8b] text-xs mb-2">Expected ECE Rollnumber Patterns:</p>
+            <div className="text-[#6b6b6b] text-xs space-y-1">
+              <div>• 2nd Year: 160424735001-045, 047-060, 301-306</div>
+              <div>• 3rd Year: 160423735001-017, 019-023, 301-308, 160422735005</div>
+              <div>• 4th Year: 160422735001-004, 006-034, 036-056, 058-060, 061-066, 068-078, 080-108, 301-314</div>
+            </div>
+          </div>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-cyan-500/20 text-cyan-400 rounded-lg hover:bg-cyan-500/30 transition-colors"
+          >
+            Retry Loading Data
+          </button>
+        </div>
       </div>
     );
   }
-  
+
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Division Filter */}
+      {/* Year Filter */}
       <div className="bg-gradient-to-r from-cyan-500/10 to-emerald-500/10 border border-cyan-500/20 rounded-xl p-3 sm:p-4">
         <div className="flex flex-col gap-3 sm:gap-4">
           <div className="flex items-center gap-3">
@@ -386,31 +521,30 @@ const ClasswiseTab: React.FC<ClasswiseTabProps> = ({
               <Users size={16} className="hidden sm:block text-cyan-400" />
             </div>
             <div className="min-w-0">
-              <p className="text-white font-semibold text-xs sm:text-sm">CSE Division {selectedDivision}</p>
+              <p className="text-white font-semibold text-xs sm:text-sm">ECE {selectedYear}</p>
               <p className="text-[#8b8b8b] text-[10px] sm:text-xs truncate">
-                Roll: {String(getDivisionRange(selectedDivision).start).padStart(3, "0")} - {String(getDivisionRange(selectedDivision).end).padStart(3, "0")}
+                Students: {yearStats.total}
               </p>
             </div>
           </div>
-          
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-            {DIVISIONS.map(div => (
+            {ECE_YEARS.map(year => (
               <button
-                key={div}
-                onClick={() => setSelectedDivision(div)}
-                className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg font-semibold text-xs sm:text-sm transition-all ${
-                  selectedDivision === div
+                key={year}
+                onClick={() => setSelectedYear(year)}
+                className={`w-24 h-8 sm:w-28 sm:h-9 rounded-lg font-semibold text-xs sm:text-sm transition-all ${
+                  selectedYear === year
                     ? "bg-cyan-500 text-white"
                     : "bg-[#1a1a1a] text-[#6b6b6b] hover:text-white hover:bg-[#222]"
                 }`}
               >
-                {div}
+                {year}
               </button>
             ))}
           </div>
         </div>
       </div>
-      
+
       {/* Summary Cards */}
       <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
         <div className="bg-[#161616] border border-[#222222] rounded-xl p-3 sm:p-4">
@@ -418,53 +552,48 @@ const ClasswiseTab: React.FC<ClasswiseTabProps> = ({
             <Users size={14} className="text-cyan-400" />
             <span className="text-[#6b6b6b] text-[9px] sm:text-xs">Students</span>
           </div>
-          <p className="text-lg sm:text-2xl font-bold text-white">{divisionStats.total}</p>
+          <p className="text-lg sm:text-2xl font-bold text-white">{yearStats.total}</p>
         </div>
-        
         <div className="bg-[#161616] border border-[#222222] rounded-xl p-3 sm:p-4">
           <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
             <CheckCircle2 size={14} className="text-emerald-400" />
             <span className="text-[#6b6b6b] text-[9px] sm:text-xs">Passed</span>
           </div>
-          <p className="text-lg sm:text-2xl font-bold text-emerald-400">{divisionStats.passed}</p>
-          <p className="text-[#6b6b6b] text-[9px] sm:text-xs">{divisionStats.passRate}%</p>
+          <p className="text-lg sm:text-2xl font-bold text-emerald-400">{yearStats.passed}</p>
+          <p className="text-[#6b6b6b] text-[9px] sm:text-xs">{yearStats.passRate}%</p>
         </div>
-        
         <div className="bg-[#161616] border border-[#222222] rounded-xl p-3 sm:p-4">
           <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
             <AlertCircle size={14} className="text-amber-400" />
             <span className="text-[#6b6b6b] text-[9px] sm:text-xs">Promoted</span>
           </div>
-          <p className="text-lg sm:text-2xl font-bold text-amber-400">{divisionStats.promoted}</p>
+          <p className="text-lg sm:text-2xl font-bold text-amber-400">{yearStats.promoted}</p>
         </div>
-        
         <div className="bg-[#161616] border border-[#222222] rounded-xl p-3 sm:p-4 hidden sm:block">
           <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
             <Award size={14} className="text-amber-400" />
             <span className="text-[#6b6b6b] text-[9px] sm:text-xs">Distinctions</span>
           </div>
-          <p className="text-lg sm:text-2xl font-bold text-amber-400">{divisionStats.distinctions}</p>
+          <p className="text-lg sm:text-2xl font-bold text-amber-400">{yearStats.distinctions}</p>
         </div>
-        
         <div className="bg-[#161616] border border-[#222222] rounded-xl p-3 sm:p-4 hidden lg:block">
           <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
             <AlertCircle size={14} className="text-rose-400" />
             <span className="text-[#6b6b6b] text-[9px] sm:text-xs">Backlogs</span>
           </div>
-          <p className="text-lg sm:text-2xl font-bold text-rose-400">{divisionStats.totalBacklogs}</p>
+          <p className="text-lg sm:text-2xl font-bold text-rose-400">{yearStats.totalBacklogs}</p>
         </div>
       </div>
-      
+
       {/* Leaderboard */}
       <div className="bg-[#161616] border border-[#222222] rounded-xl sm:rounded-2xl overflow-hidden">
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-[#1f1f1f] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Award size={16} className="text-amber-400" />
-            <h2 className="text-sm sm:text-base font-semibold text-white">Division {selectedDivision} Leaderboard</h2>
+            <h2 className="text-sm sm:text-base font-semibold text-white">{selectedYear} ECE Leaderboard</h2>
           </div>
-          <span className="text-[10px] sm:text-[11px] text-[#6b6b6b]">Semester 3 · Sorted by SGPA</span>
+          <span className="text-[10px] sm:text-[11px] text-[#6b6b6b]">Semester {semMap[selectedYear]} · Sorted by SGPA</span>
         </div>
-        
         <div className="overflow-x-auto">
           <table className="w-full min-w-[500px]">
             <thead>
@@ -481,37 +610,46 @@ const ClasswiseTab: React.FC<ClasswiseTabProps> = ({
               {leaderboard.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-4 py-8 text-center text-[#6b6b6b]">
-                    No students found in Division {selectedDivision}
+                    No students found in ECE {selectedYear}
                   </td>
                 </tr>
               ) : (
                 leaderboard.map((student, idx) => (
-                  <StudentRow key={student.rollnumber} student={student} rank={idx + 1} />
+                  <StudentRow 
+                    key={student.rollnumber} 
+                    student={student} 
+                    rank={idx + 1} 
+                    selectedYear={selectedYear}
+                  />
                 ))
               )}
             </tbody>
           </table>
         </div>
       </div>
-      
-      {/* Subject Pass Rate Comparison - Semester 3 */}
+
+      {/* Subject Pass Rate Comparison - Current Semester */}
       <div className="bg-[#161616] border border-[#222222] rounded-xl sm:rounded-2xl p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 sm:mb-5">
           <div className="flex items-center gap-2">
             <TrendingUp size={16} className="text-cyan-400" />
-            <h2 className="text-sm sm:text-base font-semibold text-white">Semester 3 Subject Pass Rates</h2>
+            <h2 className="text-sm sm:text-base font-semibold text-white">
+              Semester {semMap[selectedYear]} Subject Pass Rates (ECE {selectedYear})
+            </h2>
           </div>
-          <span className="text-[10px] sm:text-[11px] text-[#6b6b6b]">Division {selectedDivision} · {subjects.length} subjects</span>
+          <span className="text-[10px] sm:text-[11px] text-[#6b6b6b]">
+            {Object.keys(SEMESTER_3_SUBJECTS).length} subjects tracked
+          </span>
         </div>
         
-        {/* Calculate division-specific pass rates */}
+        {/* Calculate year-specific pass rates */}
         <div className="space-y-2.5 sm:space-y-3">
           {Object.entries(SEMESTER_3_SUBJECTS).map(([code, name]) => {
-            // Calculate pass rate for this subject in this division
+            // Calculate pass rate for this subject in this ECE year
             let appeared = 0;
             let passed = 0;
             
-            for (const student of divisionStudents) {
+            for (const student of yearStudents) {
               const sub = student.subjects.find(s => s.code === code);
               if (sub) {
                 appeared++;
@@ -559,4 +697,6 @@ const ClasswiseTab: React.FC<ClasswiseTabProps> = ({
   );
 };
 
-export default ClasswiseTab;
+export default ECEAnalysisTab;
+
+
