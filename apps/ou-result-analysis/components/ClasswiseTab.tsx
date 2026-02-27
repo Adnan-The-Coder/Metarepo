@@ -296,9 +296,9 @@ const ClasswiseTab: React.FC<ClasswiseTabProps> = ({
           }
         });
         if (!res.ok) throw new Error("Failed to fetch division data");
-        const data = await res.json();
+        const data = await res.json() as { students?: StudentResult[] };
         // Strictly filter by rollnumber for division
-        const filtered = (data.students || []).filter((s: StudentResult) => getStudentDivision(s.rollnumber) === selectedDivision);
+        const filtered = (data.students || []).filter((s) => getStudentDivision(s.rollnumber) === selectedDivision);
         classwiseCache[selectedDivision] = filtered;
         setDivisionStudents(filtered);
         setDivisionProgress({ current: 1, total: 1 });
