@@ -314,9 +314,9 @@ const ECEAnalysisTab = () => {
           }
         });
         if (!res.ok) throw new Error("Failed to fetch data");
-        const data = await res.json();
+        const data = await res.json() as { students?: StudentResult[] };
         // Filter strictly by rollnumber for selected year
-        const filtered = (data.students || []).filter((s: StudentResult) => isECEYearRoll(s.rollnumber, selectedYear));
+        const filtered = (data.students || []).filter((s) => isECEYearRoll(s.rollnumber, selectedYear));
         eceCache[selectedYear] = filtered;
         setStudents(filtered);
         setLoadingProgress({ current: 1, total: 1 });
@@ -374,7 +374,7 @@ const ECEAnalysisTab = () => {
               continue; // Skip failed endpoint but continue with others
             }
             
-            const data = await res.json();
+            const data:any = await res.json();
             const studentsData = data.students || [];
             
             console.log(`Fetched ${studentsData.length} students from endpoint ${i + 1}`);
