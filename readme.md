@@ -1,287 +1,126 @@
-### MetaRepo: The Development Universe
 
-A unified monorepo containing the full spectrum of projects I build, maintain, and experiment with — from open-source libraries and backend services to portfolio sites and exploratory prototypes.
-
-This repo isn't just a storage space — it's the backbone of my development workflow. Everything lives here: production-ready code, tools I share with the community, personal builds, and experimental ideas in progress.
-
-- **Portfolio Websites**: All versions of my personal portfolio (v1, v2, etc.)
-- **Backend Services**: Complete backend infrastructure and APIs
-- **Libraries & Packages**: Reusable code, utilities, and components
-- **Experiments**: Side projects, POCs, and learning experiments
-- **Open Source**: Public packages and contributions
-
-This repository serves as the single source of truth for my development work, enabling seamless integration across projects while maintaining a unified development experience.
-
-<div style="flex: 1; min-width: 250px;">
-  <h3>Built With</h3>
-  <p>
-    <img alt="TypeScript" src="https://img.shields.io/badge/-TypeScript-007ACC?style=flat-square&logo=typescript&logoColor=white" />
-    <img alt="NextJS" src="https://img.shields.io/badge/-NextJS-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
-    <img alt="pnpm" src="https://img.shields.io/badge/pnpm-F69220?style=flat-square&logo=pnpm&logoColor=white" />
-    <img alt="TailwindCSS" src="https://img.shields.io/badge/-Tailwind%20CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
-    <img alt="Cloudflare" src="https://img.shields.io/badge/Cloudflare-F38020?style=flat&logo=Cloudflare&logoColor=white" />
-    <img alt="git" src="https://img.shields.io/badge/-Git-F05032?style=flat-square&logo=git&logoColor=white" />
-    <img alt="D1" src="https://img.shields.io/badge/Cloudflare%20D1-4B8B3C?style=flat-square&logo=cloudflare&logoColor=white" />
-    <img alt="Drizzle" src="https://img.shields.io/badge/Drizzle-F27A4B?style=flat-square&logo=drizzle&logoColor=white" />
-    <img alt="Nx" src="https://img.shields.io/badge/Nx-000000?style=flat-square&logo=nx&logoColor=white" />
-    <img alt="Python" src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" />
-    <img alt="TensorFlow" src="https://img.shields.io/badge/TensorFlow-FF6F00?style=flat-square&logo=tensorflow&logoColor=white" />
-    <img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white" />
-    <img alt="Pandas" src="https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white" />
-    <img alt="Matplotlib" src="https://img.shields.io/badge/Matplotlib-003366?style=flat-square&logo=matplotlib&logoColor=white" />
-    <img alt="Jest" src="https://img.shields.io/badge/Jest-C21325?style=flat-square&logo=jest&logoColor=white" />
-    <img alt="GitHub Actions" src="https://img.shields.io/badge/GitHub%20Actions-2088FF?style=flat-square&logo=github-actions&logoColor=white" />
+<div align="center" style="margin-bottom: 1.5rem;">
+  <img src="apps/web-v2/public/metarepo_image-removebg-preview.png" alt="MetaRepo Logo" width="220" style="margin-bottom: 0.5rem;" />
+  <h1 style="font-size:2.5rem; font-weight:900; margin:0.5rem 0; letter-spacing:1px; color:#06b6d4;">MetaRepo</h1>
+  <p style="font-size:1.2rem; color:#333; margin-bottom:0.5rem;">
+    <b>The Development Universe</b>
   </p>
+  <p style="font-size:1rem; color:#444; max-width:600px; margin:0 auto;">
+    A unified monorepo containing all my work — from personal projects and open-source libraries to my portfolio and coding experiments.<br>
+    It’s a single place to track my development journey, share ideas, and build in the open.<br>
+    <b>Major things coming soon here from private repos 😅</b>
+  </p>
+  <p>
+    <a href="https://adnanthecoder.com" style="font-size:1.1rem; font-weight:700; color:#06b6d4;">adnanthecoder.com</a>
+  </p>
+  <div style="margin-top:1rem;">
+    <img alt="AWS" src="https://img.shields.io/badge/AWS-232F3E?style=flat-square&logo=amazon-aws&logoColor=white" />
+    <img alt="GCP" src="https://img.shields.io/badge/GCP-4285F4?style=flat-square&logo=google-cloud&logoColor=white" />
+    <img alt="Azure" src="https://img.shields.io/badge/Azure-0078D4?style=flat-square&logo=microsoft-azure&logoColor=white" />
+    <img alt="Cloudflare" src="https://img.shields.io/badge/Cloudflare-F38020?style=flat-square&logo=cloudflare&logoColor=white" />
+    <img alt="Heroku" src="https://img.shields.io/badge/Heroku-430098?style=flat-square&logo=heroku&logoColor=white" />
+    <img alt="Kubernetes" src="https://img.shields.io/badge/Kubernetes-326CE5?style=flat-square&logo=kubernetes&logoColor=white" />
+    <img alt="Docker" src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" />
+    <img alt="Kafka" src="https://img.shields.io/badge/Kafka-231F20?style=flat-square&logo=apache-kafka&logoColor=white" />
+    <img alt="Prometheus" src="https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white" />
+    <img alt="Node.js" src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=node.js&logoColor=white" />
+    <img alt="NestJS" src="https://img.shields.io/badge/NestJS-E0234E?style=flat-square&logo=nestjs&logoColor=white" />
+    <img alt="Golang" src="https://img.shields.io/badge/Go-00ADD8?style=flat-square&logo=go&logoColor=white" />
+    <img alt="Rust" src="https://img.shields.io/badge/Rust-000000?style=flat-square&logo=rust&logoColor=white" />
+    <img alt="Java" src="https://img.shields.io/badge/Java-007396?style=flat-square&logo=java&logoColor=white" />
+    <img alt="Spring Boot" src="https://img.shields.io/badge/Spring%20Boot-6DB33F?style=flat-square&logo=spring-boot&logoColor=white" />
+  </div>
 </div>
 
+---
+
+## 🌌 The Mission
+
+**MetaRepo** is not just a monorepo—it's a living showcase of best practices in DevOps, MLOps, and cloud-native engineering. Here you'll find:
+
+- Real-world deployment configs for every major cloud platform (**AWS**, **GCP**, **Azure**, **Cloudflare**, **Heroku**) and edge provider.
+- End-to-end DevOps/MLOps blueprints: CI/CD pipelines, monitoring, observability, and infrastructure-as-code.
+- Boilerplates and production templates for **Kubernetes**, **Kafka**, **Prometheus**, **Docker**, and more.
+- Multi-language support: **Node.js**, **NestJS**, **Golang**, **Rust**, **Java/Spring Boot**, and every stack I explore.
+- As I build new projects, every deployment pattern, config, and best practice will be documented and committed here for the community.
+
+All projects are orchestrated to live under the [adnanthecoder.com](https://adnanthecoder.com) domain, forming a cohesive, open platform for my work and learning.
+
+## 🚀 Repository Highlights
+
+### 🧪 Advanced Analytics
+- **[OU Result Analysis](apps/ou-result-analysis/)**: A high-performance dashboard for Osmania University students. It features robust year-wise filtering (2nd, 3rd, 4th Year), automated leaderboard generation based on SGPA, and a clean UI for navigating complex result data.
+
+### 💼 Portfolio Evolution
+- **[Web-V2](apps/web-v2/)**: The current-generation flagship site. Built with Next.js 15, it represents the cutting edge of my frontend expertise, featuring seamless animations and edge-optimized performance.
+- **[Web-V1](apps/web-v1/)**: The foundation that started it all—now serving as a reference for legacy implementations and architectural growth.
+
+### 🛡️ Core Infrastructure & Backend
+- **[Admin-Web](apps/admin-web/)**: The command center for maintaining all internal services and managing database interactions.
+- **[CF-Server](apps/cf-server/)**: A cloud-native backend powered by Cloudflare Workers. It uses Drizzle ORM and Cloudflare D1 to deliver low-latency, globally distributed APIs.
+- **[Super-Auth](packages/super-auth/)**: A private-grade authentication library now consolidated into the monorepo for universal use across my applications.
 
 ---
 
-## Getting Started
+## 🛠️ The Tech Stack
 
-To get started with the project, follow the steps below.
+I leverage a modern, industrial-strength stack to ensure every project is scalable, type-safe, and ready for the edge.
 
-### 1. Clone the Repository
+<table align="center">
+  <tr>
+    <td align="center"><b>Frameworks</b></td>
+    <td align="center"><b>Logic & Types</b></td>
+    <td align="center"><b>Database & ORM</b></td>
+    <td align="center"><b>Infrastructure</b></td>
+  </tr>
+  <tr>
+    <td>Next.js 15, React 19</td>
+    <td>TypeScript, Nx</td>
+    <td>Cloudflare D1, Drizzle</td>
+    <td>Cloudflare Workers/Pages</td>
+  </tr>
+</table>
 
-First, clone the repository to your local machine using the following command:
-
-```bash
-git clone https://github.com/Adnan-The-Coder/zero-day-codebase.git
-```
-
-### 2. Install `pnpm`
-
-`pnpm` is the package manager used for managing dependencies in this repository. To install `pnpm`, follow the steps below based on your operating system:
-
-#### For macOS or Linux:
-
-You can install `pnpm` globally using **Homebrew** (macOS) or **npm** (Linux/macOS):
-
-```bash
-npm install -g pnpm
-```
-
-#### For Windows:
-
-You can install `pnpm` using **npm** via the command prompt:
-
-```bash
-npm install -g pnpm
-```
-
-If you encounter any issues with the installation, refer to the [official pnpm documentation](https://pnpm.io/installation).
+<div align="center">
+  <img alt="TypeScript" src="https://img.shields.io/badge/-TypeScript-007ACC?style=flat-square&logo=typescript&logoColor=white" />
+  <img alt="NextJS" src="https://img.shields.io/badge/-NextJS-000000?style=flat-square&logo=nextdotjs&logoColor=white" />
+  <img alt="Nx" src="https://img.shields.io/badge/Nx-000000?style=flat-square&logo=nx&logoColor=white" />
+  <img alt="pnpm" src="https://img.shields.io/badge/pnpm-F69220?style=flat-square&logo=pnpm&logoColor=white" />
+  <img alt="Cloudflare" src="https://img.shields.io/badge/Cloudflare-F38020?style=flat&logo=Cloudflare&logoColor=white" />
+  <img alt="TailwindCSS" src="https://img.shields.io/badge/-Tailwind%20CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
+</div>
 
 ---
 
-### 3. Install Dependencies
+## 📂 Monorepo Orchestration
 
-Once `pnpm` is installed, navigate to the root directory of the project (where the `package.json` is located) and run the following command to install all the dependencies:
+This codebase uses **Nx** to manage the relationship between apps and packages.
 
-```bash
-pnpm install
-```
-
-This will install the necessary packages for both the `web` UI and any other internal libraries or applications.
-
----
-
-## Running the Web UI
-
-The project contains a `web` application built using **Next.js**. To run the application, follow these steps:
-
-### 1. Run the Web UI Locally
-
-To start the `web` application locally, use the following command:
-
-```bash
-nx serve web
-```
-
-This will start the development server on a local machine and you can access the application in your browser at [http://localhost:3000](http://localhost:3000). If port 3000 is already in use, it will automatically use the next available port (e.g., 3001).
-
-### 2. What Happens in the `web` Application
-
-The `web` application is built using **Next.js**, a React framework, and is designed to be used as the user interface of this project. Any changes made within the `web` directory will trigger rebuilding the project and potentially redeploying the application to **Cloudflare Workers**.
+### Getting Started
+1. **Clone & Install**:
+   ```bash
+   git clone https://github.com/Adnan-The-Coder/zero-day-codebase.git
+   cd Metarepo
+   pnpm install
+   ```
+2. **Serve an App**:
+   ```bash
+   # Launch the ECE/CSE Result Analysis tool
+   nx serve ou-result-analysis
+   
+   # Launch the v2 Portfolio
+   nx serve web-v2
+   ```
 
 ---
 
-## Deployment to Cloudflare Workers
+## 📡 Live Ecosystem
 
-The `web` application is also deployed to **Cloudflare Workers**. This deployment happens automatically when changes are made inside the `web` folder.
-
-### 1. Deployment Flow
-
-* Changes made within the `apps/web` folder will trigger a deployment to **Cloudflare Workers**. This is managed by **OpenNext** scripts written with pnpm run build and pnpm  run deploy, through CD pipeline using Cloudflare accont ID and API token.
-* Every time you run the `nx serve web` command and changes are made, the build will trigger the deployment process to Cloudflare Workers, ensuring the latest version is always live.
+Most of these applications are deployed via **OpenNext** onto **Cloudflare Pages**, providing sub-second load times globally. You can find the results of this monorepo live at [adnanthecoder.com](https://adnanthecoder.com).
 
 ---
 
-## General Nx Commands
-
-Nx provides several commands for managing your monorepo, including tasks like running, building, testing, and linting applications and libraries.
-
-### 1. `nx serve <project>`
-
-Starts the development server for a given project (e.g., `web`).
-
-```bash
-nx serve web
-```
-
-This will start the development server for the `web` project, and you can access the application at `http://localhost:3000` (or the next available port).
-
-### 2. `nx build <project>`
-
-Builds the project and compiles the code.
-
-```bash
-nx build web
-```
-
-This command will build the `web` project and output the compiled code to the `dist/` folder, which is ready for deployment.
-
-### 3. `nx lint <project>`
-
-Runs linting checks on the specified project.
-
-```bash
-nx lint web
-```
-
-This will check the `web` project for linting errors, and output any issues found.
-
-### 4. `nx test <project>`
-
-Runs unit tests for a given project.
-
-```bash
-nx test web
-```
-
-This will run the unit tests for the `web` project and show the results in the terminal.
-
-### 5. `nx affected:build`
-
-Builds the affected projects based on the changes made to the workspace.
-
-```bash
-nx affected:build --base=main --head=HEAD
-```
-
-This will only build projects that were affected by the changes between the `main` branch and the current branch.
-
-### 6. `nx run-many`
-
-Run a target (e.g., build, test, lint) for multiple projects at once.
-
-```bash
-nx run-many --target=build --projects=web,other-app
-```
-
-This command allows you to run the `build` target for both the `web` project and another app in the workspace.
-
-### 7. `nx migrate`
-
-Upgrade the Nx workspace and its dependencies to the latest version.
-
-```bash
-nx migrate latest
-```
-
-This will migrate your workspace to the latest Nx version, making sure everything is up-to-date.
-
----
-
-## Folder Structure
-
-Here's a quick overview of the folder structure in the monorepo:
-```
-zero-day-codebase/
-├── .github/                 # Contains Tests, CI/CD pipelines using github action workflows
-├── apps/                    # Application packages
-│   ├── web/                 # Main web application
-│   ├── cf-server/           # Cloudflare workers deployed, Backend server for Platform analytics, user related CRUD operations and APIs enabled features
-│   ├── python backend/      # Python Backend (coming soon...)
-├── packages/                # Shared packages
-├── nx.json/                 # Configurationa file of nx 
-├── pnpm-lock.yaml/          # Lockfile for pnpm dependencies 
-├── package.json/            # Root package manager configuration 
-└── pnpm-workspace.yaml/     # Defines the structure and workspace of pnpm monorepo
-```
-
----
-
-## Troubleshooting
-
-If you run into any issues, here are a few things to check:
-
-* **Make sure `pnpm` is installed**: Verify that you can run `pnpm --version` to ensure `pnpm` is installed globally.
-* **Run Nx with `--verbose`**: If a command isn't working as expected, try adding `--verbose` to get more detailed error logs.
-* **Clear Nx cache**: If things are stuck, try clearing the Nx cache with `nx reset` and reinstall dependencies.
-
----
-
-# Contributing Guidelines
-
-## 1. Branching Strategy
-
-Start from dev branch: When starting any work, always create your branch from the dev branch.
-Branch naming convention:
-
-- For new features: feat/featurename
-- For bug fixes: fix/whatyouarefixing
-- For updating content: update/whereyouareupdating
-- For documentation updates: docs/whatyouupdated
-- For refactoring code: refactor/whatyourefactored
-- For urgent hotfixes: hotfix/urgentfix
-
-## 2. Pull Request (PR) Workflow
-
-### Step 1: Development
-
-After completing task, push changes and create a PR to merge your branch into the dev branch.
-Provide a clear description of the changes in the PR.
-
-Testing Stage is avoided in this rapid development phase and the code is reviewed while merging to main branch itself.
-
-### Step 2: Production
-
-After successful testing, create a PR from the test branch to the main branch.
-This PR must be approved by the CTO and at least 1 other member.
-Once approved, the changes will be deployed to production.
-
-## 3. Commit Message Guidelines
-
-Use the following prefixes for clear and consistent commit messages:
-
-```
-feat: for new features.
-fix: for bug fixes.
-docs: for documentation updates.
-refactor: for code refactoring.
-style: for formatting and style changes (not affecting code logic).
-test: for adding or updating tests.
-chore: for maintenance tasks.
-```
-
-```
-Example: feat: add user authentication to login page.
-```
-
-## 4. CI/CD Pipeline Requirements
-
-The CI/CD pipeline must run error-free.
-
-## 5. Conflict Resolution
-
-If any merge conflicts arise, contributors should immediately contact the [Adnan](https://github.com/Adnan-The-Coder) for resolution.
-
-## 6. Emergency Procedure
-
-In case of critical hotfixes or urgent issues, [Adnan](https://github.com/Adnan-The-Coder) must trigger the emergency procedure.
-
----
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+<p align="center">
+  <i>"Building the future, one commit at a time."</i><br>
+  <b>Adnan • <a href="https://adnanthecoder.com">adnanthecoder.com</a></b>
+</p>
