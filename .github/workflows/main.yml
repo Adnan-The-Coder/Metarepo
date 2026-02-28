@@ -2,9 +2,9 @@ name: Nx CI Pipeline
 
 on:
   push:
-    branches: [main, dev, test]
+    branches: [master, dev, test]
   pull_request:
-    branches: [main, dev, test]
+    branches: [master, dev, test]
 
 env:
   NODE_VERSION: '22.16.0'
