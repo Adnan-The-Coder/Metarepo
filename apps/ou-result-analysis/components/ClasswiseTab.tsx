@@ -28,10 +28,15 @@ const getDivisionRange = (div: Division): { start: number; end: number } => {
 };
 
 const getStudentDivision = (rollnumber: string): Division | null => {
-  // Extract last 3 digits - e.g., "160424733045" -> 45
+  // Robust batch prefix check (e.g., "160424733")
+  // Only allow CSE roll numbers: prefix '160424733'
+  const csePrefix = "160424733";
+  if (!rollnumber.startsWith(csePrefix)) return null;
+
+  // Extract last 3 digits for division
   const lastDigits = parseInt(rollnumber.slice(-3), 10);
   if (isNaN(lastDigits) || lastDigits < 1 || lastDigits > 480) return null;
-  
+
   const divIndex = Math.floor((lastDigits - 1) / 60);
   return DIVISIONS[divIndex] || null;
 };
