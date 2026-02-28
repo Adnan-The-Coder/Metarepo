@@ -1,6 +1,6 @@
 import { Context } from "hono";
 import { drizzle } from "drizzle-orm/d1";
-import { eq, desc, asc, like, and } from "drizzle-orm";
+import { eq, desc, asc, like, and, gte, lte } from "drizzle-orm";
 import { osmania_university_results_storage } from "../db/schema";
 
 // ---- CREATE: Insert a new result record ----
@@ -396,6 +396,68 @@ export const getResultByRollNumber = async (c: Context) => {
       {
         success: false,
         message: "Failed to fetch results",
+        error: error instanceof Error ? error.message : "Unknown error"
+      },
+      500
+    );
+  }
+};
+
+
+export const getByRange = async (c: Context) => {
+  try {
+    const db = drizzle(c.env.DB);
+
+    // ---- Get range parameter ----
+    const rollRange = c.req.query("rollnumber");
+
+    if (!rollRange || !rollRange.includes("-")) {
+      return c.json(
+        {
+          success: false,
+          message: "Please provide rollnumber range in format start-end"
+        },
+        400
+      );
+    }
+
+    const [start, end] = rollRange.split("-");
+
+    if (!start || !end) {
+      return c.json(
+        {
+          success: false,
+          message: "Invalid range format. Use start-end"
+        },
+        400
+      );
+    }
+
+    // ---- Query with range filter ----
+    const results = await db
+      .select()
+      .from(osmania_university_results_storage)
+      .where(
+        and(
+          gte(osmania_university_results_storage.rollnumber, start),
+          lte(osmania_university_results_storage.rollnumber, end)
+        )
+      )
+      .orderBy(asc(osmania_university_results_storage.rollnumber));
+
+    return c.json({
+      success: true,
+      total: results.length,
+      data: results
+    });
+
+  } catch (error) {
+    console.error("Error fetching range results:", error);
+
+    return c.json(
+      {
+        success: false,
+        message: "Failed to fetch results by range",
         error: error instanceof Error ? error.message : "Unknown error"
       },
       500

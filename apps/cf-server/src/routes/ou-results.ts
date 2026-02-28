@@ -7,6 +7,7 @@ import {
   updateResult,
   deleteResult,
   getResultByRollNumber,
+  getByRange,
 } from "../controllers/ou.results.controller";
 
 const ouResultsRoutes = new Hono<{ Bindings: CloudflareBindings }>();
@@ -16,6 +17,7 @@ const ouResultsRoutes = new Hono<{ Bindings: CloudflareBindings }>();
 
 // GET /ou-results - Get all results with pagination and filtering
 ouResultsRoutes.get("/", getAllResults);
+ouResultsRoutes.get("/range", getByRange);
 
 // GET /ou-results/:id - Get a specific result by ID
 ouResultsRoutes.get("/:id", getResultById);
