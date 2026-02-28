@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import OverviewTab from "@/components/OverviewTab";
 import ClasswiseTab from "@/components/ClasswiseTab";
+import ECETab from "@/components/ECETab";
 import SubjectwiseTab from "@/components/SubjectwiseTab";
 import PasspercentTab from "@/components/PasspercentTab";
 import { useOUResults } from "@/lib";
@@ -16,6 +17,7 @@ import {
   X,
   Download,
   FileDown,
+  Cpu,
 } from "lucide-react";
 
 // ─── Brand Logo ──────────────────────────────────────────────────────────────
@@ -28,7 +30,7 @@ const OULogo = () => (
 );
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type Tab = "overview" | "classwise" | "subjectwise" | "passpercent";
+type Tab = "overview" | "classwise" | "ece" | "subjectwise" | "passpercent";
 
 // ─── CSV Export Function ─────────────────────────────────────────────────────
 const exportToCSV = (students: { rollnumber: string; name: string; subjects: { code: string; name: string; grade: string; credits: number }[]; semesterResults: { semester: number; result: string; sgpa: number | null }[] }[], filename: string, semester = 3) => {
@@ -101,6 +103,7 @@ const OsmaniaDashboard = () => {
   
   // Use the OU Results hook for live data
   const {
+    entries,
     students,
     semesterAnalytics,
     selectedSemester,
@@ -118,7 +121,8 @@ const OsmaniaDashboard = () => {
 
   const tabs: { key: Tab; label: string; icon: React.ElementType }[] = [
     { key: "overview", label: "Overview", icon: BarChart3 },
-    { key: "classwise", label: "Class Wise", icon: Users },
+    { key: "classwise", label: "CSE Class Wise", icon: Users },
+    { key: "ece", label: "ECE Dept.", icon: Cpu },
     { key: "subjectwise", label: "Subject Wise", icon: BookOpen },
     { key: "passpercent", label: "Pass Percent", icon: TrendingUp },
   ];
@@ -431,6 +435,17 @@ const OsmaniaDashboard = () => {
                 <ClasswiseTab
                   students={students}
                   subjects={semesterAnalytics?.subjects || []}
+                  isLoading={isLoading}
+                  loadingProgress={loadingProgress}
+                  error={error}
+                  onRefresh={refetch}
+                />
+              )}
+              {activeTab === "ece" && (
+                <ECETab
+                  students={students}
+                  entries={entries}
+
                   isLoading={isLoading}
                   loadingProgress={loadingProgress}
                   error={error}

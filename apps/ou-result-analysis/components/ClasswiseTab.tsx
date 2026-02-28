@@ -343,6 +343,16 @@ const ClasswiseTab: React.FC<ClasswiseTabProps> = ({
   
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Compact CSE MJCET 2nd Year '24 Batch Brand Subtitle */}
+      <div className="mb-2">
+        <h1 className="text-2xl font-bold text-white leading-tight">Class Wise</h1>
+        <div className="flex items-center gap-2 mt-1">
+          <GraduationCap size={18} className="text-cyan-400" />
+          <span className="text-cyan-400 text-sm font-semibold">CSE MJCET 2nd Year</span>
+          <span className="text-cyan-300 text-xs font-medium">‘24 Batch Students Stats</span>
+        </div>
+        <p className="text-[#8b8b8b] text-xs mt-1">February-2026 · Osmania University</p>
+      </div>
       {/* Division Filter */}
       <div className="bg-gradient-to-r from-cyan-500/10 to-emerald-500/10 border border-cyan-500/20 rounded-xl p-3 sm:p-4">
         <div className="flex flex-col gap-3 sm:gap-4">
