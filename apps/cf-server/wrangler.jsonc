@@ -3,6 +3,7 @@
   "name": "metarepo-cf-server",
   "main": "src/index.ts",
   "compatibility_date": "2025-07-12",
+	"compatibility_flags": ["nodejs_compat"],
   "assets": {
     "binding": "ASSETS",
     "directory": "./public"
