@@ -191,7 +191,7 @@ export default function AboutSection() {
                   </svg>
                 </button>
                 <a
-                  href="#"
+                  href="https://drive.google.com/file/d/1nT-Mx3MItOSyhvikndWF25WGlMPlHP5V/view?usp=drivesdk"
                   className="inline-flex items-center gap-2 rounded-[3px] border border-white/[0.08] px-5 py-2.5 text-sm font-semibold text-white/45 hover:border-white/[0.16] hover:text-white/70 transition-all duration-200"
                 >
                   View Resume
