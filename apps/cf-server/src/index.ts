@@ -6,6 +6,7 @@ import type { CloudflareBindings } from "./types";
 import consultRoutes from "./routes/consult";
 import mailRoute from "./routes/mail";
 import ouResultsRoutes from "./routes/ou-results";
+import paymentRoutes from "./routes/payment";
 
 interface HealthStatus {
   status: "healthy" | "unhealthy";
@@ -58,6 +59,7 @@ const ALLOWED_ORIGINS = new Set([
   "https://adnanthecoder.com",
   "https://result-analzed-at.ghost-server.workers.dev",
   "https://metrics.ou-results.adnanthecoder.com",
+  "https://projexis-license-key-gen.adnanthecoder.com",
 ]);
 
 app.use(
@@ -181,6 +183,7 @@ app.get("/message", (c) => {
 app.route("/consult", consultRoutes);
 app.route('/mail', mailRoute);
 app.route("/ou-results", ouResultsRoutes);
+app.route("/payment", paymentRoutes);
 
 
 export default app;
