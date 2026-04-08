@@ -5,642 +5,661 @@ type TerminalLine = {
   text: string;
   delay: number;
   color: string;
-};
-type SystemStats = {
-  cpu: number;
-  memory: number;
-  network: {
-    in: number;
-    out: number;
-  };
-  processes: string[];
-  temperature: number;
-  uptime: number;
+  type?: 'cmd' | 'output' | 'success' | 'info';
 };
 
+type WorkMetric = {
+  label: string;
+  value: string;
+  sub: string;
+  color: string;
+  pulse: string;
+};
 
 const Hero = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [leftTerminalLines, setLeftTerminalLines] = useState<TerminalLine[]>([]);
-  const [rightSystemStats, setRightSystemStats] = useState<SystemStats>({
-  cpu: 0,
-  memory: 0,
-  network: { in: 0, out: 0 },
-  processes: [],
-  temperature: 0,
-  uptime: 0,
-});
+  const [terminalLines, setTerminalLines] = useState<TerminalLine[]>([]);
+  const [tickUptime, setTickUptime] = useState(0);
+  const [visibleMetrics, setVisibleMetrics] = useState(false);
+  const [glitchActive, setGlitchActive] = useState(false);
+  const [cursorBlink, setCursorBlink] = useState(true);
 
-  const canvasRef = useRef(null);
-  const overlayCanvasRef = useRef(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
-  const cpuHistoryRef = useRef(new Array(20).fill(0));
-  const memoryHistoryRef = useRef(new Array(20).fill(0));
-  const networkHistoryRef = useRef({ in: new Array(20).fill(0), out: new Array(20).fill(0) });
 
-  const commandSets = [
+  // --- BUSINESS-FOCUSED terminal sequences ---
+  const commandSets: TerminalLine[][] = [
     [
-      { text: '$ git status', delay: 800, color: '#10b981' },
-      { text: 'On branch main', delay: 300, color: '#cbd5e1' },
-      { text: '$ npm run build', delay: 1000, color: '#10b981' },
-      { text: '✓ Compiled successfully', delay: 600, color: '#22c55e' }
+      { text: '$ deploy crm-system --client="RetailCo"', delay: 700, color: '#00e5ff', type: 'cmd' },
+      { text: '  › Bundling 43 modules...', delay: 400, color: '#64748b', type: 'output' },
+      { text: '  › Database migrations applied', delay: 350, color: '#64748b', type: 'output' },
+      { text: '  ✓ CRM live at crm.retailco.com', delay: 300, color: '#00ff88', type: 'success' },
+      { text: '  ✓ 12,000 contacts imported', delay: 250, color: '#00ff88', type: 'success' },
     ],
     [
-      { text: '$ docker ps', delay: 800, color: '#10b981' },
-      { text: 'CONTAINER ID   STATUS', delay: 400, color: '#06b6d4' },
-      { text: 'f2a1c3d5e7   Up 2 hours', delay: 300, color: '#22c55e' },
-      { text: '$ kubectl get pods', delay: 1000, color: '#10b981' },
-      { text: 'portfolio-app   Running', delay: 400, color: '#22c55e' }
+      { text: '$ build mvp --scope="EdTech LMS"', delay: 700, color: '#00e5ff', type: 'cmd' },
+      { text: '  › Course engine scaffolded', delay: 400, color: '#64748b', type: 'output' },
+      { text: '  › Payment gateway integrated', delay: 350, color: '#64748b', type: 'output' },
+      { text: '  ✓ MVP shipped in 18 days', delay: 300, color: '#00ff88', type: 'success' },
+      { text: '  ✓ First 200 students enrolled', delay: 250, color: '#a78bfa', type: 'info' },
     ],
     [
-      { text: '$ tail -f app.log', delay: 800, color: '#10b981' },
-      { text: '[INFO] Server started', delay: 400, color: '#3b82f6' },
-      { text: '[INFO] DB connected', delay: 300, color: '#22c55e' },
-      { text: '[INFO] Ready for requests', delay: 500, color: '#06b6d4' }
-    ]
+      { text: '$ automate workflow --type="lead-pipeline"', delay: 700, color: '#00e5ff', type: 'cmd' },
+      { text: '  › Webhook triggers configured', delay: 400, color: '#64748b', type: 'output' },
+      { text: '  › CRM sync established', delay: 350, color: '#64748b', type: 'output' },
+      { text: '  ✓ 6hrs/week saved for client', delay: 300, color: '#00ff88', type: 'success' },
+      { text: '  ✓ Pipeline conversion +34%', delay: 250, color: '#a78bfa', type: 'info' },
+    ],
+    [
+      { text: '$ brand design --client="FinanceStartup"', delay: 700, color: '#00e5ff', type: 'cmd' },
+      { text: '  › Logo system generated', delay: 350, color: '#64748b', type: 'output' },
+      { text: '  › Color palette & typography locked', delay: 300, color: '#64748b', type: 'output' },
+      { text: '  ✓ Brand guide delivered', delay: 250, color: '#00ff88', type: 'success' },
+    ],
   ];
 
-  const processes = [
-    'node server.js',
-    'nginx master',
-    'postgres main',
-    'redis-server',
-    'docker daemon',
-    'kubectl proxy'
+  const workMetrics: WorkMetric[] = [
+    { label: 'MVPs Shipped', value: '14+', sub: 'end-to-end builds', color: '#00e5ff', pulse: '#00e5ff' },
+    { label: 'Businesses Served', value: '20+', sub: 'across industries', color: '#00ff88', pulse: '#00ff88' },
+    { label: 'Automations Live', value: '1k+', sub: 'tasks automated/mo', color: '#a78bfa', pulse: '#a78bfa' },
+    { label: 'Avg. Delivery', value: '18d', sub: 'concept to launch', color: '#fbbf24', pulse: '#fbbf24' },
+  ];
+
+  const offerings = [
+    { icon: '⬡', label: 'End-to-End MVPs', desc: 'Full stack from zero to launch' },
+    { icon: '⬡', label: 'CRM & LMS Systems', desc: 'Custom tools that replace off-shelf software' },
+    { icon: '⬡', label: 'Business Automation', desc: 'Eliminate repetitive ops with code' },
+    { icon: '⬡', label: 'Brand Identity', desc: 'Visual systems that mean business' },
   ];
 
   // Terminal animation
   useEffect(() => {
     let currentSet = 0;
-    let currentCommand = 0;
-    let timeoutId:any;
+    let currentLine = 0;
+    let timeout: ReturnType<typeof setTimeout>;
 
-    const executeCommands = () => {
-      const commandSet = commandSets[currentSet];
-      const command = commandSet[currentCommand];
-
-      setLeftTerminalLines(prev => [...prev, command].slice(-8));
-
-      currentCommand++;
-      if (currentCommand >= commandSet.length) {
-        currentCommand = 0;
+    const runNext = () => {
+      const set = commandSets[currentSet];
+      const line = set[currentLine];
+      setTerminalLines(prev => [...prev, line].slice(-10));
+      currentLine++;
+      if (currentLine >= set.length) {
+        currentLine = 0;
         currentSet = (currentSet + 1) % commandSets.length;
-        timeoutId = setTimeout(executeCommands, 2000);
+        timeout = setTimeout(runNext, 2200);
       } else {
-        timeoutId = setTimeout(executeCommands, command.delay);
+        timeout = setTimeout(runNext, line.delay);
       }
     };
-
-    executeCommands();
-    return () => clearTimeout(timeoutId);
+    runNext();
+    return () => clearTimeout(timeout);
   }, []);
 
-  // System stats
+  // Uptime ticker
   useEffect(() => {
-    const updateStats = () => {
-      setRightSystemStats((prev) => {
-        const newCpu = Math.max(15, Math.min(95, prev.cpu + (Math.random() - 0.5) * 25));
-        const newMemory = Math.max(25, Math.min(85, prev.memory + (Math.random() - 0.5) * 20));
-        const newNetworkIn = Math.max(0, Math.min(100, prev.network.in + (Math.random() - 0.5) * 40));
-        const newNetworkOut = Math.max(0, Math.min(100, prev.network.out + (Math.random() - 0.5) * 35));
+    const iv = setInterval(() => setTickUptime(t => t + 1), 1000);
+    return () => clearInterval(iv);
+  }, []);
 
-        cpuHistoryRef.current.push(newCpu);
-        cpuHistoryRef.current.shift();
-        
-        memoryHistoryRef.current.push(newMemory);
-        memoryHistoryRef.current.shift();
-        
-        networkHistoryRef.current.in.push(newNetworkIn);
-        networkHistoryRef.current.in.shift();
-        networkHistoryRef.current.out.push(newNetworkOut);
-        networkHistoryRef.current.out.shift();
+  // Cursor blink
+  useEffect(() => {
+    const iv = setInterval(() => setCursorBlink(b => !b), 530);
+    return () => clearInterval(iv);
+  }, []);
 
-        return {
-          cpu: newCpu,
-          memory: newMemory,
-          network: { in: newNetworkIn, out: newNetworkOut },
-          processes: processes.sort(() => 0.5 - Math.random()).slice(0, 4),
-          temperature: 45 + Math.random() * 20,
-          uptime: prev.uptime + 1
-        };
-      });
+  // Staggered metric reveal
+  useEffect(() => {
+    const t = setTimeout(() => setVisibleMetrics(true), 800);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Glitch effect on name
+  useEffect(() => {
+    const triggerGlitch = () => {
+      setGlitchActive(true);
+      setTimeout(() => setGlitchActive(false), 180);
     };
-
-    setRightSystemStats({
-      cpu: 45 + Math.random() * 20,
-      memory: 60 + Math.random() * 15,
-      network: { in: 30 + Math.random() * 20, out: 25 + Math.random() * 15 },
-      processes: processes.slice(0, 4),
-      temperature: 55,
-      uptime: 0
-    });
-
-    const interval = setInterval(updateStats, 2000);
-    return () => clearInterval(interval);
+    const iv = setInterval(triggerGlitch, 4200);
+    return () => clearInterval(iv);
   }, []);
 
-  // Enhanced background animation with integrated elements
+  // Mouse tracking
   useEffect(() => {
-    const canvas:any = canvasRef.current;
-    const overlayCanvas:any = overlayCanvasRef.current;
-    if (!canvas || !overlayCanvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    const overlayCtx = overlayCanvas.getContext('2d');
-    
-    const updateCanvasSize = () => {
+    const handler = (e: MouseEvent) => setMousePosition({ x: e.clientX, y: e.clientY });
+    window.addEventListener('mousemove', handler);
+    return () => window.removeEventListener('mousemove', handler);
+  }, []);
+
+  // Canvas background
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d')!;
+
+    const resize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      overlayCanvas.width = window.innerWidth;
-      overlayCanvas.height = window.innerHeight;
     };
-    
-    updateCanvasSize();
-    window.addEventListener('resize', updateCanvasSize);
+    resize();
+    window.addEventListener('resize', resize);
+
+    const particles = Array.from({ length: 30 }, () => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: (Math.random() - 0.5) * 0.25,
+      alpha: Math.random() * 0.35 + 0.05,
+      size: Math.random() * 1.2 + 0.4,
+    }));
 
     let time = 0;
-    
-    // Floating particles
-    const particles = Array.from({ length: 25 }, () => ({ // Reduced from 50 to 25
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.3, // Slower movement
-      vy: (Math.random() - 0.5) * 0.3,
-      alpha: Math.random() * 0.4 + 0.05, // More subtle
-      size: Math.random() * 1.5 + 0.3
-    }));
-
-    // Data streams for minimal effect
-    const dataStreams = Array.from({ length: 4 }, (_, i) => ({ // Reduced from 8 to 4
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      chars: '01',
-      speed: 1.5 + Math.random() * 2, // Slower
-      opacity: 0.2 + Math.random() * 0.2 // More subtle
-    }));
-    
     const animate = () => {
-      // Clear both canvases
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillStyle = 'rgba(0,0,0,0.045)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-      
-      time += 0.01;
+      time += 0.008;
 
-      // Subtle data streams - minimal
-      dataStreams.forEach((stream, index) => {
-        if (index % 3 === 0) { // Only show every 3rd stream
-          overlayCtx.fillStyle = `rgba(0, 255, 255, ${stream.opacity * 0.1})`;
-          overlayCtx.font = '10px monospace';
-          
-          for (let i = 0; i < 5; i++) { // Reduced from 15 to 5
-            const char = stream.chars[Math.floor(Math.random() * stream.chars.length)];
-            overlayCtx.fillText(
-              char, 
-              stream.x, 
-              stream.y + i * 30 - (time * stream.speed * 20) % (canvas.height + 300)
-            );
-          }
-        }
-      });
-
-      // Floating particles - cleaner connections
-      particles.forEach((particle, index) => {
-        particle.x += particle.vx;
-        particle.y += particle.vy;
-        
-        if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
-        if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
-        
-        // Draw particle
+      particles.forEach((p, i) => {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
         ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 255, 255, ${particle.alpha * 0.6})`;
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0,229,255,${p.alpha * 0.5})`;
         ctx.fill();
-
-        // Connect only very close particles
-        particles.slice(index + 1).forEach(otherParticle => {
-          const dx = particle.x - otherParticle.x;
-          const dy = particle.y - otherParticle.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          
-          if (distance < 60) { // Reduced from 100 to 60
+        particles.slice(i + 1).forEach(o => {
+          const d = Math.hypot(p.x - o.x, p.y - o.y);
+          if (d < 80) {
             ctx.beginPath();
-            ctx.moveTo(particle.x, particle.y);
-            ctx.lineTo(otherParticle.x, otherParticle.y);
-            ctx.strokeStyle = `rgba(0, 255, 255, ${(1 - distance / 60) * 0.05})`;
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(o.x, o.y);
+            ctx.strokeStyle = `rgba(0,229,255,${(1 - d / 80) * 0.04})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
         });
       });
 
-      // Central energy field - more subtle
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
-      
-      for (let ring = 1; ring <= 2; ring++) { // Reduced from 4 to 2 rings
-        const segments = ring * 6; // Reduced segments
-        const baseRadius = Math.min(canvas.width, canvas.height) * 0.08; // Smaller radius
-        
-        for (let i = 0; i < segments; i++) {
-          const angle = (i / segments) * Math.PI * 2 + time * (ring % 2 === 0 ? 0.2 : -0.15);
-          const radius = ring * baseRadius + Math.sin(time * 1.2 + ring) * 8;
-          const x = centerX + Math.cos(angle) * radius;
-          const y = centerY + Math.sin(angle) * radius;
-          
-          const opacity = 0.05 + Math.sin(time * 1.5 + i + ring) * 0.02; // More subtle
-          const size = 0.8 + Math.sin(time * 1.5 + i) * 0.3;
-          
-          ctx.beginPath();
-          ctx.arc(x, y, size, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(0, 255, 255, ${opacity})`;
-          ctx.fill();
-        }
-      }
+      // Horizontal scan lines - subtle
+      const scanY = (time * 60) % canvas.height;
+      const sg = ctx.createLinearGradient(0, scanY - 40, 0, scanY + 2);
+      sg.addColorStop(0, 'rgba(0,229,255,0)');
+      sg.addColorStop(1, 'rgba(0,229,255,0.025)');
+      ctx.fillStyle = sg;
+      ctx.fillRect(0, scanY - 40, canvas.width, 42);
 
-      // Subtle data flow streams
-      const streamCount = Math.max(2, Math.floor(canvas.height / 300)); // Reduced streams
-      for (let i = 0; i < streamCount; i++) {
-        const progress = (time * 0.3 + i / streamCount) % 1; // Slower
-        const startX = canvas.width * 0.1;
-        const endX = canvas.width * 0.9;
-        const y = canvas.height * 0.3 + (i * canvas.height * 0.2);
-        
-        const currentX = startX + (endX - startX) * progress;
-        
-        const gradient = ctx.createLinearGradient(currentX - 40, y, currentX, y);
-        gradient.addColorStop(0, 'rgba(0, 255, 255, 0)');
-        gradient.addColorStop(0.8, 'rgba(0, 255, 255, 0.08)');
-        gradient.addColorStop(1, 'rgba(0, 255, 255, 0.2)');
-        
-        ctx.strokeStyle = gradient;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(Math.max(0, currentX - 40), y);
-        ctx.lineTo(currentX, y);
-        ctx.stroke();
-        
-        // Subtle data packets
-        if (progress > 0.2) {
-          ctx.beginPath();
-          ctx.arc(currentX, y, 1, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(0, 255, 255, 0.4)';
-          ctx.fill();
-        }
-      }
-      
       animationRef.current = requestAnimationFrame(animate);
     };
-    
     animate();
-
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
-      window.removeEventListener('resize', updateCanvasSize);
+      window.removeEventListener('resize', resize);
     };
   }, []);
 
-  useEffect(() => {
-    const handleMouseMove = (e:any) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  // Enhanced SVG Chart Component with better visibility and styling
-  const MiniChart = ({ data, color, height = 30, showFill = true }:any) => {
-    const maxValue = Math.max(...data);
-    const minValue = Math.min(...data);
-    const range = maxValue - minValue || 1;
-    
-    return (
-      <svg width="100%" height={height} className="overflow-visible">
-        <defs>
-          <filter id={`glow-${color.replace('#', '')}`} x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-            <feMerge> 
-              <feMergeNode in="coloredBlur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-          <linearGradient id={`gradient-${color.replace('#', '')}`} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor={color} stopOpacity="0.4"/>
-            <stop offset="50%" stopColor={color} stopOpacity="0.2"/>
-            <stop offset="100%" stopColor={color} stopOpacity="0.05"/>
-          </linearGradient>
-          <linearGradient id={`line-gradient-${color.replace('#', '')}`} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor={color} stopOpacity="0.6"/>
-            <stop offset="50%" stopColor={color} stopOpacity="1"/>
-            <stop offset="100%" stopColor={color} stopOpacity="0.8"/>
-          </linearGradient>
-        </defs>
-        
-        {/* Background grid dots */}
-        {Array.from({ length: 5 }, (_, i) => (
-          <line
-            key={i}
-            x1="0"
-            x2="100"
-            y1={height * (i + 1) / 6}
-            y2={height * (i + 1) / 6}
-            stroke={color}
-            strokeOpacity="0.1"
-            strokeWidth="0.5"
-            strokeDasharray="1,2"
-          />
-        ))}
-        
-        {showFill && (
-          <path
-            d={`M0,${height} ${data.map((value:any, index:any) => {
-              const x = (index / (data.length - 1)) * 100;
-              const y = height - ((value - minValue) / range) * (height * 0.8) - height * 0.1;
-              return `L${x},${y}`;
-            }).join(' ')} L100,${height} Z`}
-            fill={`url(#gradient-${color.replace('#', '')})`}
-          />
-        )}
-        
-        {/* Main line with enhanced visibility */}
-        <polyline
-          points={data.map((value:any, index:any) => {
-            const x = (index / (data.length - 1)) * 100;
-            const y = height - ((value - minValue) / range) * (height * 0.8) - height * 0.1;
-            return `${x},${y}`;
-          }).join(' ')}
-          fill="none"
-          stroke={`url(#line-gradient-${color.replace('#', '')})`}
-          strokeWidth="2.5"
-          filter={`url(#glow-${color.replace('#', '')})`}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        
-        {/* Data points */}
-        {data.map((value:any, index:any) => {
-          const x = (index / (data.length - 1)) * 100;
-          const y = height - ((value - minValue) / range) * (height * 0.8) - height * 0.1;
-          return (
-            <circle
-              key={index}
-              cx={x}
-              cy={y}
-              r="1.5"
-              fill={color}
-              opacity={index === data.length - 1 ? "1" : "0.6"}
-              filter={`url(#glow-${color.replace('#', '')})`}
-            />
-          );
-        })}
-        
-        {/* Current value indicator */}
-        <circle
-          cx={100}
-          cy={height - ((data[data.length - 1] - minValue) / range) * (height * 0.8) - height * 0.1}
-          r="3"
-          fill={color}
-          opacity="0.8"
-        >
-          <animate attributeName="r" values="3;4;3" dur="2s" repeatCount="indefinite"/>
-          <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" repeatCount="indefinite"/>
-        </circle>
-      </svg>
-    );
+  const formatUptime = (s: number) => {
+    const h = Math.floor(s / 3600).toString().padStart(2, '0');
+    const m = Math.floor((s % 3600) / 60).toString().padStart(2, '0');
+    const sec = (s % 60).toString().padStart(2, '0');
+    return `${h}:${m}:${sec}`;
   };
 
   return (
-    <div className="relative min-h-screen bg-black overflow-hidden font-sans pt-24 lg:pt-28">
-      {/* Multi-layer background */}
-      <canvas ref={canvasRef} className="absolute inset-0 z-0" />
-      <canvas ref={overlayCanvasRef} className="absolute inset-0 z-5 opacity-60" />
-      
-      {/* Subtle gradient overlays */}
-      <div className="absolute inset-0 bg-gradient-radial from-cyan-900/5 via-transparent to-transparent z-10" />
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900/10 via-transparent to-slate-900/10 z-15" />
+    <div className="relative min-h-screen bg-black overflow-hidden" style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
 
-      {/* Interactive mouse glow */}
+        .hero-headline {
+          font-family: 'Space Grotesk', sans-serif;
+          font-weight: 800;
+          letter-spacing: -0.03em;
+        }
+        .hero-sub {
+          font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .glitch-wrap { position: relative; display: inline-block; }
+        .glitch-wrap.active .glitch-main { opacity: 0; }
+        .glitch-wrap::before,
+        .glitch-wrap::after {
+          content: attr(data-text);
+          position: absolute;
+          top: 0; left: 0;
+          width: 100%; height: 100%;
+          font-family: 'Space Grotesk', sans-serif;
+          font-weight: 800;
+          letter-spacing: -0.03em;
+          opacity: 0;
+        }
+        .glitch-wrap.active::before {
+          color: #00e5ff;
+          opacity: 0.8;
+          clip-path: polygon(0 20%, 100% 20%, 100% 45%, 0 45%);
+          transform: translateX(-3px);
+          animation: none;
+        }
+        .glitch-wrap.active::after {
+          color: #ff00aa;
+          opacity: 0.8;
+          clip-path: polygon(0 55%, 100% 55%, 100% 80%, 0 80%);
+          transform: translateX(3px);
+          animation: none;
+        }
+
+        .cta-primary {
+          position: relative;
+          overflow: hidden;
+          background: #00e5ff;
+          color: #000;
+          font-family: 'Space Grotesk', sans-serif;
+          font-weight: 700;
+          letter-spacing: 0.04em;
+          transition: all 0.2s;
+        }
+        .cta-primary::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+          transform: translateX(-100%);
+          transition: transform 0.5s;
+        }
+        .cta-primary:hover::after { transform: translateX(100%); }
+        .cta-primary:hover { background: #33ecff; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,229,255,0.35); }
+
+        .cta-secondary {
+          font-family: 'Space Grotesk', sans-serif;
+          font-weight: 600;
+          letter-spacing: 0.04em;
+          border: 1px solid rgba(0,229,255,0.3);
+          color: rgba(0,229,255,0.9);
+          transition: all 0.2s;
+          background: transparent;
+        }
+        .cta-secondary:hover {
+          border-color: rgba(0,229,255,0.7);
+          color: #fff;
+          background: rgba(0,229,255,0.06);
+          transform: translateY(-2px);
+        }
+
+        .metric-card {
+          border: 1px solid rgba(255,255,255,0.06);
+          background: rgba(255,255,255,0.025);
+          backdrop-filter: blur(8px);
+          transition: all 0.3s;
+        }
+        .metric-card:hover {
+          border-color: rgba(0,229,255,0.2);
+          background: rgba(0,229,255,0.04);
+        }
+
+        .offering-row {
+          border-bottom: 1px solid rgba(255,255,255,0.04);
+          transition: all 0.2s;
+        }
+        .offering-row:hover {
+          border-bottom-color: rgba(0,229,255,0.15);
+          background: rgba(0,229,255,0.02);
+        }
+        .offering-row:last-child { border-bottom: none; }
+
+        .terminal-box {
+          background: rgba(0,0,0,0.7);
+          border: 1px solid rgba(0,229,255,0.12);
+          backdrop-filter: blur(12px);
+        }
+
+        .tag-badge {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 10px;
+          border: 1px solid rgba(0,229,255,0.2);
+          color: rgba(0,229,255,0.6);
+          background: rgba(0,229,255,0.04);
+          letter-spacing: 0.1em;
+        }
+
+        .status-dot {
+          animation: statusPulse 2s ease-in-out infinite;
+        }
+        @keyframes statusPulse {
+          0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,255,136,0.5); }
+          50% { opacity: 0.7; box-shadow: 0 0 0 4px rgba(0,255,136,0); }
+        }
+
+        .fade-up {
+          animation: fadeUp 0.6s ease forwards;
+        }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .corner-tl { border-top: 1.5px solid rgba(0,229,255,0.25); border-left: 1.5px solid rgba(0,229,255,0.25); }
+        .corner-tr { border-top: 1.5px solid rgba(0,229,255,0.25); border-right: 1.5px solid rgba(0,229,255,0.25); }
+        .corner-bl { border-bottom: 1.5px solid rgba(0,229,255,0.25); border-left: 1.5px solid rgba(0,229,255,0.25); }
+        .corner-br { border-bottom: 1.5px solid rgba(0,229,255,0.25); border-right: 1.5px solid rgba(0,229,255,0.25); }
+
+        @media (max-width: 1023px) {
+          .hero-headline { font-size: clamp(2.8rem, 10vw, 5rem); }
+        }
+      `}</style>
+
+      {/* Canvas */}
+      <canvas ref={canvasRef} className="absolute inset-0 z-0" />
+
+      {/* Radial vignette */}
+      <div className="absolute inset-0 z-1" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 50%, transparent 40%, rgba(0,0,0,0.6) 100%)' }} />
+
+      {/* Mouse glow */}
       <div
-        className="fixed w-32 h-32 lg:w-64 lg:h-64 rounded-full pointer-events-none z-20 transition-all duration-700 ease-out opacity-15 hidden md:block"
+        className="fixed pointer-events-none z-10 hidden md:block"
         style={{
-          background: 'radial-gradient(circle, rgba(0,255,255,0.15) 0%, rgba(0,255,255,0.05) 30%, transparent 70%)',
-          transform: `translate(${mousePosition.x - 128}px, ${mousePosition.y - 128}px)`,
-          filter: 'blur(1px)'
+          width: 360, height: 360, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(0,229,255,0.07) 0%, transparent 70%)',
+          transform: `translate(${mousePosition.x - 180}px, ${mousePosition.y - 180}px)`,
+          transition: 'transform 0.12s linear',
         }}
       />
 
-      {/* Mobile Layout */}
-      <div className="lg:hidden">
-        {/* Main content */}
-        <div className="relative z-25 px-4 py-20 text-center max-w-3xl mx-auto">
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight mb-3 leading-tight">
-            <span className="brand-heading drop-shadow-lg">Adnan</span>
-          </h1>
-          <h2 className="text-lg sm:text-xl font-semibold tracking-[0.2em] text-slate-200/90 mb-4 uppercase">
-            Full Stack Developer
-          </h2>
-          <p className="text-base text-slate-300/80 max-w-xl mx-auto leading-relaxed mb-9">
-            Architecting scalable, edge-first experiences with tasteful dark UI.
-          </p>
-          
-          <div className="flex flex-col gap-3 mb-12">
-            <button className="px-6 py-3 rounded-lg bg-cyan-500 text-black font-semibold hover:bg-cyan-400 transition-all duration-300 shadow-lg shadow-cyan-500/25">
-              Explore Projects
-            </button>
-            <button
-              onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-              className="px-6 py-3 rounded-lg border border-cyan-500/40 text-cyan-200 font-semibold hover:border-cyan-400/60 hover:text-white transition-all duration-300"
+      {/* Corner decorations */}
+      <div className="absolute top-0 left-0 w-10 h-10 corner-tl z-40" />
+      <div className="absolute top-0 right-0 w-10 h-10 corner-tr z-40" />
+      <div className="absolute bottom-0 left-0 w-10 h-10 corner-bl z-40" />
+      <div className="absolute bottom-0 right-0 w-10 h-10 corner-br z-40" />
+
+      {/* STATUS BAR */}
+      <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-5 py-2.5" style={{ borderBottom: '1px solid rgba(0,229,255,0.07)', background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)' }}>
+        <div className="flex items-center gap-3">
+          <div className="status-dot w-2 h-2 rounded-full" style={{ background: '#00ff88' }} />
+          <span className="text-xs" style={{ color: 'rgba(0,229,255,0.5)', letterSpacing: '0.12em' }}>SYSTEM ONLINE</span>
+        </div>
+        <div className="flex items-center gap-4 text-xs" style={{ color: 'rgba(100,116,139,0.8)', letterSpacing: '0.08em' }}>
+          <span className="hidden sm:block">SESSION {formatUptime(tickUptime)}</span>
+          <span>ADNAN.DEV</span>
+        </div>
+      </div>
+
+      {/* ===================== MAIN LAYOUT ===================== */}
+      <div className="relative z-20 min-h-screen flex flex-col justify-center pt-12">
+
+        {/* DESKTOP */}
+        <div className="hidden lg:grid max-w-7xl mx-auto w-full px-10 gap-10" style={{ gridTemplateColumns: '1fr 2fr 1fr', alignItems: 'center', minHeight: 'calc(100vh - 48px)' }}>
+
+          {/* LEFT — Terminal work log */}
+          <div className="flex flex-col gap-5">
+            {/* Live badge */}
+            <div className="flex items-center gap-2">
+              <div className="status-dot w-1.5 h-1.5 rounded-full" style={{ background: '#00ff88' }} />
+              <span className="text-xs" style={{ color: 'rgba(0,229,255,0.45)', letterSpacing: '0.15em' }}>LIVE BUILD LOG</span>
+            </div>
+
+            {/* Terminal */}
+            <div className="terminal-box rounded-lg p-4 space-y-1.5 min-h-48">
+              {terminalLines.map((line, i) => (
+                <div
+                  key={i}
+                  className="text-xs leading-relaxed fade-up"
+                  style={{ color: line.color, opacity: 0.85 + (i / terminalLines.length) * 0.15 }}
+                >
+                  {line.text}
+                </div>
+              ))}
+              <span className="text-xs" style={{ color: '#00e5ff', opacity: cursorBlink ? 0.9 : 0 }}>█</span>
+            </div>
+
+            {/* Offerings list */}
+            <div className="space-y-0 mt-2">
+              <div className="text-xs mb-3" style={{ color: 'rgba(0,229,255,0.35)', letterSpacing: '0.12em' }}>WHAT I BUILD</div>
+              {offerings.map((o, i) => (
+                <div key={i} className="offering-row flex items-start gap-3 py-2.5 px-1 cursor-default">
+                  <span className="text-xs mt-0.5 flex-shrink-0" style={{ color: '#00e5ff', opacity: 0.5 }}>⬡</span>
+                  <div>
+                    <div className="text-xs hero-sub font-semibold" style={{ color: 'rgba(255,255,255,0.85)', letterSpacing: '0.02em' }}>{o.label}</div>
+                    <div className="text-xs mt-0.5" style={{ color: 'rgba(100,116,139,0.8)' }}>{o.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* CENTER — Main hero content */}
+          <div className="flex flex-col items-center text-center px-6">
+
+            {/* Eyebrow */}
+            <div className="tag-badge px-3 py-1 rounded-full mb-8 fade-up">
+              FULL STACK BUILDER · MVP → PRODUCTION
+            </div>
+
+            {/* Name */}
+            <div className="mb-3">
+              <div
+                className={`glitch-wrap ${glitchActive ? 'active' : ''}`}
+                data-text="ADNAN"
+              >
+                <h1
+                  className="glitch-main hero-headline"
+                  style={{
+                    fontSize: 'clamp(4rem, 8vw, 7rem)',
+                    color: '#ffffff',
+                    lineHeight: 1,
+                    textShadow: '0 0 60px rgba(0,229,255,0.15)',
+                  }}
+                >
+                  ADNAN
+                </h1>
+              </div>
+            </div>
+
+            {/* Tagline */}
+            <h2
+              className="hero-sub font-semibold mb-5"
+              style={{
+                fontSize: 'clamp(0.95rem, 1.5vw, 1.2rem)',
+                color: 'rgba(0,229,255,0.7)',
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+              }}
             >
-              Connect
+              I Turn Business Pain Into Working Software
+            </h2>
+
+            {/* Value prop */}
+            <p
+              className="hero-sub mb-3 max-w-xl mx-auto"
+              style={{ color: 'rgba(255,255,255,0.65)', fontSize: '1.05rem', lineHeight: 1.75 }}
+            >
+              Full stack developer specialising in MVPs, CRMs, LMS platforms, automation systems — and the brand identity to match.
+            </p>
+            <p
+              className="hero-sub mb-12 max-w-lg mx-auto font-semibold"
+              style={{ color: 'rgba(255,255,255,0.9)', fontSize: '1rem', lineHeight: 1.7 }}
+            >
+              You describe the problem. I ship the solution.
+            </p>
+
+            {/* CTAs */}
+            <div className="flex gap-4 mb-14">
+              <button
+                className="cta-primary px-9 py-3.5 rounded-lg text-sm"
+                onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                See My Work →
+              </button>
+              <button
+                className="cta-secondary px-9 py-3.5 rounded-lg text-sm"
+                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                Start a Project
+              </button>
+            </div>
+
+            {/* Metrics row */}
+            <div
+              className="grid grid-cols-4 gap-3 w-full max-w-xl"
+              style={{ opacity: visibleMetrics ? 1 : 0, transition: 'opacity 0.8s ease' }}
+            >
+              {workMetrics.map((m, i) => (
+                <div
+                  key={i}
+                  className="metric-card rounded-lg py-3 px-2 text-center"
+                  style={{ animationDelay: `${i * 0.1}s` }}
+                >
+                  <div
+                    className="hero-sub font-bold mb-0.5"
+                    style={{ fontSize: '1.4rem', color: m.color, lineHeight: 1 }}
+                  >
+                    {m.value}
+                  </div>
+                  <div className="text-xs font-semibold hero-sub" style={{ color: 'rgba(255,255,255,0.7)', marginBottom: 2 }}>{m.label}</div>
+                  <div style={{ fontSize: '10px', color: 'rgba(100,116,139,0.7)', letterSpacing: '0.05em' }}>{m.sub}</div>
+                </div>
+              ))}
+            </div>
+
+          </div>
+
+          {/* RIGHT — Availability & tech stack signal */}
+          <div className="flex flex-col gap-5">
+
+            {/* Availability card */}
+            <div className="terminal-box rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="status-dot w-2 h-2 rounded-full" style={{ background: '#00ff88' }} />
+                <span className="text-xs" style={{ color: '#00ff88', letterSpacing: '0.12em' }}>AVAILABLE FOR WORK</span>
+              </div>
+              <div className="space-y-2 text-xs" style={{ color: 'rgba(100,116,139,0.9)' }}>
+                <div className="flex justify-between">
+                  <span>Response time</span>
+                  <span style={{ color: 'rgba(255,255,255,0.7)' }}>&lt; 24h</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Avg. delivery</span>
+                  <span style={{ color: 'rgba(255,255,255,0.7)' }}>14–21 days</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Timezone</span>
+                  <span style={{ color: 'rgba(255,255,255,0.7)' }}>UTC+5:30</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Current slot</span>
+                  <span style={{ color: '#00ff88' }}>Open</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Stack tags */}
+            <div className="terminal-box rounded-lg p-4">
+              <div className="text-xs mb-3" style={{ color: 'rgba(0,229,255,0.35)', letterSpacing: '0.12em' }}>TECH STACK</div>
+              <div className="flex flex-wrap gap-1.5">
+                {['Next.js','React','Node','TypeScript','PostgreSQL','Redis','Docker','Prisma','Stripe','Tailwind','AWS','Figma'].map(t => (
+                  <span key={t} className="tag-badge px-2 py-0.5 rounded">{t}</span>
+                ))}
+              </div>
+            </div>
+
+            {/* Mini testimonial */}
+            <div className="terminal-box rounded-lg p-4">
+              <div className="text-xs mb-3" style={{ color: 'rgba(0,229,255,0.35)', letterSpacing: '0.12em' }}>CLIENT SIGNAL</div>
+              <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)', fontStyle: 'italic' }}>
+                "Shipped our entire CRM + onboarding flow in 3 weeks. The system replaced three separate SaaS tools we were paying for."
+              </p>
+              <div className="mt-2 text-xs" style={{ color: 'rgba(100,116,139,0.6)' }}>— Founder, B2B SaaS</div>
+            </div>
+
+            {/* Direct link */}
+            <button
+              className="cta-primary w-full py-3 rounded-lg text-sm text-center"
+              onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              Book a Discovery Call
             </button>
           </div>
+
         </div>
 
-        {/* Floating system info */}
-        <div className="absolute top-1/2 left-4 transform -translate-y-1/2 space-y-4 z-25">
-          {/* Terminal lines */}
-          <div className="space-y-2">
-            {leftTerminalLines.slice(-3).map((line, index) => (
-              <div key={index} className="font-mono text-xs opacity-60 transition-all duration-500" style={{ color: line.color }}>
-                {line.text}
+        {/* =================== MOBILE =================== */}
+        <div className="lg:hidden flex flex-col px-5 pt-8 pb-16 min-h-screen justify-center gap-6 max-w-lg mx-auto w-full">
+
+          {/* Eyebrow */}
+          <div className="tag-badge w-fit px-3 py-1 rounded-full fade-up">
+            FULL STACK BUILDER · MVP → PRODUCTION
+          </div>
+
+          {/* Headline */}
+          <div>
+            <h1
+              className="hero-headline mb-2"
+              style={{ fontSize: 'clamp(3.2rem, 14vw, 5rem)', color: '#fff', lineHeight: 1, textShadow: '0 0 40px rgba(0,229,255,0.12)' }}
+            >
+              ADNAN
+            </h1>
+            <h2
+              className="hero-sub font-semibold"
+              style={{ fontSize: '0.8rem', color: 'rgba(0,229,255,0.65)', letterSpacing: '0.2em', textTransform: 'uppercase' }}
+            >
+              I Turn Business Pain Into Working Software
+            </h2>
+          </div>
+
+          <p className="hero-sub text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
+            MVPs, CRMs, LMS platforms, automation systems — and the brand identity to match. You describe the problem. I ship the solution.
+          </p>
+
+          {/* Metrics */}
+          <div className="grid grid-cols-2 gap-2">
+            {workMetrics.map((m, i) => (
+              <div key={i} className="metric-card rounded-lg py-3 px-3">
+                <div className="hero-sub font-bold" style={{ fontSize: '1.5rem', color: m.color, lineHeight: 1 }}>{m.value}</div>
+                <div className="text-xs hero-sub font-medium mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>{m.label}</div>
+                <div style={{ fontSize: '10px', color: 'rgba(100,116,139,0.6)' }}>{m.sub}</div>
               </div>
             ))}
           </div>
+
+          {/* CTAs */}
+          <div className="flex flex-col gap-2.5">
+            <button
+              className="cta-primary w-full py-3.5 rounded-lg text-sm"
+              onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              See My Work →
+            </button>
+            <button
+              className="cta-secondary w-full py-3.5 rounded-lg text-sm"
+              onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              Book a Discovery Call
+            </button>
+          </div>
+
+          {/* Availability + terminal — compact */}
+          <div className="terminal-box rounded-lg p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="status-dot w-1.5 h-1.5 rounded-full" style={{ background: '#00ff88' }} />
+                <span className="text-xs" style={{ color: '#00ff88', letterSpacing: '0.1em' }}>AVAILABLE NOW</span>
+              </div>
+              <span className="text-xs" style={{ color: 'rgba(100,116,139,0.6)' }}>UTC+5:30</span>
+            </div>
+            <div className="space-y-1">
+              {terminalLines.slice(-4).map((line, i) => (
+                <div key={i} className="text-xs leading-relaxed" style={{ color: line.color, opacity: 0.75 }}>
+                  {line.text}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Stack */}
+          <div className="flex flex-wrap gap-1.5">
+            {['Next.js','React','Node.js','TypeScript','PostgreSQL','Docker','Stripe','AWS'].map(t => (
+              <span key={t} className="tag-badge px-2 py-0.5 rounded">{t}</span>
+            ))}
+          </div>
+
         </div>
 
-        <div className="absolute top-1/2 right-4 transform -translate-y-1/2 space-y-6 z-25">
-          {/* CPU */}
-          <div className="text-right">
-            <div className="text-xs font-mono text-cyan-400/80 mb-1">CPU {Math.round(rightSystemStats.cpu)}%</div>
-            <div className="w-16 h-4">
-              <MiniChart data={cpuHistoryRef.current.slice(-8)} color="#00ffff" height={16} showFill={false} />
-            </div>
-          </div>
-
-          {/* Memory */}
-          <div className="text-right">
-            <div className="text-xs font-mono text-purple-400/80 mb-1">MEM {Math.round(rightSystemStats.memory)}%</div>
-            <div className="w-16 h-4">
-              <MiniChart data={memoryHistoryRef.current.slice(-8)} color="#a855f7" height={16} showFill={false} />
-            </div>
-          </div>
-
-          {/* Network */}
-          <div className="text-right">
-            <div className="text-xs font-mono text-green-400/80 mb-1">NET</div>
-            <div className="w-16 h-3 mb-1">
-              <MiniChart data={networkHistoryRef.current.in.slice(-8)} color="#22c55e" height={12} showFill={false} />
-            </div>
-            <div className="w-16 h-3">
-              <MiniChart data={networkHistoryRef.current.out.slice(-8)} color="#16a34a" height={12} showFill={false} />
-            </div>
-          </div>
-        </div>
       </div>
-
-      {/* Desktop Layout */}
-      <div className="hidden lg:block">
-        <div className="grid grid-cols-12 gap-8 max-w-7xl mx-auto px-6 lg:px-10 py-16 min-h-[80vh] items-center">
-          
-          {/* Left - Floating terminal */}
-          <div className="col-span-3 flex flex-col justify-center">
-            <div className="space-y-4">
-              <div className="text-cyan-400/80 font-mono text-sm mb-4 flex items-center">
-                <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3 animate-pulse" />
-                ~/portfolio
-              </div>
-              <div className="space-y-3">
-                {leftTerminalLines.map((line, index) => (
-                  <div key={index} className="font-mono text-sm transition-all duration-500 opacity-80 hover:opacity-100" style={{ color: line.color }}>
-                    {line.text}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Center */}
-          <div className="col-span-6 flex flex-col justify-center items-center text-center relative z-25">
-            <h1 className="text-6xl xl:text-7xl font-black tracking-tight mb-6 leading-tight">
-              <span className="brand-heading drop-shadow-2xl">Adnan</span>
-            </h1>
-            <h2 className="text-xl xl:text-2xl font-semibold tracking-[0.28em] text-slate-200/90 mb-8 uppercase">
-              Full Stack Developer
-            </h2>
-            <p className="text-lg text-slate-300/85 max-w-2xl mx-auto leading-relaxed mb-16">
-              <span className="block">Architecting scalable, edge-first solutions.</span>
-              <span className="block text-slate-200 font-semibold mt-1">Revolutionize your systems, one build at a time.</span>
-            </p>
-
-            <div className="flex gap-6 mb-16">
-              <button className="px-10 py-4 rounded-lg bg-cyan-500 text-black font-semibold hover:bg-cyan-400 transition-all duration-300 hover:scale-105 shadow-lg shadow-cyan-500/25" onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}>
-                Explore Projects
-              </button>
-              <button
-                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-                className="px-10 py-4 rounded-lg border border-cyan-500/40 text-cyan-200 font-semibold hover:border-cyan-400/60 hover:text-white transition-all duration-300 hover:scale-105"
-              >
-                Connect
-              </button>
-            </div>
-
-          </div>
-
-          {/* Right - Floating system stats */}
-          <div className="col-span-3 flex flex-col justify-center space-y-8">
-            
-            {/* CPU */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="text-cyan-300 font-mono text-sm flex items-center">
-                  <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3 animate-pulse shadow-lg shadow-cyan-400/50" />
-                  CPU
-                </div>
-                <span className="text-xl font-mono text-white font-bold drop-shadow-lg">{Math.round(rightSystemStats.cpu)}%</span>
-              </div>
-              <div className="h-12 mb-3">
-                <MiniChart data={cpuHistoryRef.current} color="#00ffff" height={48} />
-              </div>
-              <div className="flex justify-between text-xs font-mono text-slate-300/80">
-                <span>8 cores</span>
-                <span>{Math.round(rightSystemStats.temperature)}°C</span>
-              </div>
-            </div>
-
-            {/* Memory */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="text-purple-300 font-mono text-sm flex items-center">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full mr-3 animate-pulse shadow-lg shadow-purple-400/50" />
-                  MEMORY
-                </div>
-                <span className="text-xl font-mono text-white font-bold drop-shadow-lg">{Math.round(rightSystemStats.memory)}%</span>
-              </div>
-              <div className="h-12 mb-3">
-                <MiniChart data={memoryHistoryRef.current} color="#a855f7" height={48} />
-              </div>
-              <div className="text-xs font-mono text-slate-300/80">
-                {(rightSystemStats.memory * 0.16).toFixed(1)}GB / 16GB
-              </div>
-            </div>
-
-            {/* Network */}
-            <div className="space-y-4">
-              <div className="text-green-300 font-mono text-sm flex items-center">
-                <div className="w-2 h-2 bg-green-400 rounded-full mr-3 animate-pulse shadow-lg shadow-green-400/50" />
-                NETWORK I/O
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <div className="text-sm font-mono text-slate-200/90 mb-2 flex items-center justify-between">
-                    <span>↓ DOWNLOAD</span>
-                    <span className="text-green-300 font-bold">{Math.round(rightSystemStats.network.in)} MB/s</span>
-                  </div>
-                  <div className="h-8">
-                    <MiniChart data={networkHistoryRef.current.in} color="#22c55e" height={32} />
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm font-mono text-slate-200/90 mb-2 flex items-center justify-between">
-                    <span>↑ UPLOAD</span>
-                    <span className="text-green-300 font-bold">{Math.round(rightSystemStats.network.out)} MB/s</span>
-                  </div>
-                  <div className="h-8">
-                    <MiniChart data={networkHistoryRef.current.out} color="#16a34a" height={32} />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Processes */}
-            <div className="space-y-4">
-              <div className="text-yellow-300 font-mono text-sm flex items-center">
-                <div className="w-2 h-2 bg-yellow-400 rounded-full mr-3 animate-pulse shadow-lg shadow-yellow-400/50" />
-                PROCESSES
-              </div>
-              <div className="space-y-3">
-                {rightSystemStats.processes.map((process, index) => (
-                  <div key={index} className="flex items-center justify-between text-sm font-mono">
-                    <span className="text-slate-200/90 truncate mr-3">{process}</span>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-green-400 rounded-full opacity-80 animate-pulse shadow-sm shadow-green-400/50" />
-                      <span className="text-green-300 text-xs">ACTIVE</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Minimal corner decorations */}
-      <div className="absolute top-0 left-0 w-8 h-8 lg:w-12 lg:h-12 border-l border-t border-cyan-500/20 z-40" />
-      <div className="absolute top-0 right-0 w-8 h-8 lg:w-12 lg:h-12 border-r border-t border-cyan-500/20 z-40" />
-      <div className="absolute bottom-0 left-0 w-8 h-8 lg:w-12 lg:h-12 border-l border-b border-cyan-500/20 z-40" />
-      <div className="absolute bottom-0 right-0 w-8 h-8 lg:w-12 lg:h-12 border-r border-b border-cyan-500/20 z-40" />
     </div>
   );
 };

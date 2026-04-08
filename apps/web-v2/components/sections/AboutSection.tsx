@@ -223,7 +223,7 @@ export default function AboutSection() {
           </div>
 
           {/* ── SKILL CARDS ── */}
-          {/* <div>
+          <div>
             <p className="text-[9px] uppercase tracking-[0.22em] text-white/20 font-semibold mb-4">
               Core Disciplines
             </p>
@@ -252,7 +252,7 @@ export default function AboutSection() {
                 </div>
               ))}
             </div>
-          </div> */}
+          </div>
 
           {/* ── STATS BAR ── */}
           <div className="rounded-[3px] border border-white/[0.05] bg-white/[0.012] overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.3)]">

@@ -1,18 +1,18 @@
 {
-  "name": "web-v2",
-  "sourceRoot": "apps/web-v2/src",
+  "name": "result-analytics",
+  "sourceRoot": "apps/result-analytics/src",
   "projectType": "application",
   "targets": {
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm --filter web-v2 dev"
+        "command": "pnpm --filter result-analytics dev"
       }
     },
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm --filter web-v2 build"
+        "command": "pnpm --filter result-analytics build"
       }
     }
   }
