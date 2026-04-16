@@ -23,29 +23,6 @@
     "quotePerson": "Shoeb, Founder"
   },
   {
-    "id": "Cognithesis",
-    "company": "Cognithesis",
-    "industry": "FinTech",
-    "tagline": "AI Based Research and Information optimization",
-    "challenge": "Migrate monolithic legacy system to cloud-native, reduce operational costs, improve deployment frequency.",
-    "outcome": "4-week transformation. 70% cost reduction. 10x faster deployments.",
-    "metrics": {
-      "costReduction": 70,
-      "deploymentSpeedup": 10,
-      "latencyImprovement": 60,
-      "scalabilityGain": 8,
-      "teamUpskilling": 95
-    },
-    "businessImpact": {
-      "annualSavings": "$1.8M",
-      "deploymentFrequency": "monthly → daily",
-      "teamCapacity": "Freed 4 FTEs for innovation"
-    },
-    "architecture": ["Kubernetes", "Microservices",  "D1 Database", "Redis","Cloudflare","CI/CD Pipelines","Kafka"],
-    "testimonial": "The transformation was strategic, not just technical. Adnan understood our business constraints and architected a modern platform that actually scales.",
-    "quotePerson": "Ismail, Founder & CEO"
-  },
-  {
     "id": "saas-optimization",
     "company": "Electroplix",
     "industry": "AI Infrastructure",
